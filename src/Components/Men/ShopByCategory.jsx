@@ -1,0 +1,57 @@
+'use client';
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+
+const ShopByCategory = ({ apiUrl, title = 'Shop by Category' }) => {
+  const [products, setProducts] = useState([]);
+
+  const redirectToFilter = (category) => {
+    localStorage.setItem('filterCategory', category);
+    window.location.href = '/filter';
+  };
+
+  useEffect(() => {
+    fetch(apiUrl)
+      .then((res) => res.json())
+      .then((data) => setProducts(data))
+      .catch((err) => console.error('Failed to fetch products:', err));
+  }, [apiUrl]);
+
+  return (
+    <div id="Shop-Category" className="py-10 bg-gray-100">
+      <div className="container mx-auto px-4">
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8 uppercase tracking-wide">
+          {title}
+        </h1>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+          {products.slice(0, 12).map((product) => (
+            <div
+              key={product.id}
+              onClick={() => redirectToFilter(product.title)}
+              className="bg-white border-4 border-red-500 overflow-hidden shadow hover:scale-105 transition-all cursor-pointer"
+            >
+              <div className="w-full aspect-[3/4] relative bg-white p-8">
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  fill
+                  className="p-2"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                />
+              </div>
+
+              <div className="bg-red-600 text-white text-center py-3 px-2">
+                <p className="text-sm font-medium">Casual Wear</p>
+                <p className="text-xl font-extrabold mt-1">40-80% OFF</p>
+                <p className="text-sm mt-1 font-semibold">Shop Now</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ShopByCategory;

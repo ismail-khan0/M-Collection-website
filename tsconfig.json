@@ -18,10 +18,24 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",  // Ensures baseUrl is set to the root directory
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"]  // Correctly map the @ alias to the src folder
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/Components/**/*.js",  // Ensure .js files under src/Components are included
+    "src/Components/**/*.jsx", // Ensure .jsx files under src/Components are included
+    "src/app/**/*.js",  // Ensure .js files under src/app are included
+    "src/app/**/*.jsx"  // Ensure .jsx files under src/app are included
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

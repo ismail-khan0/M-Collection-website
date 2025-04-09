@@ -1,0 +1,11 @@
+// app/not-found.tsx (for App Router in Next.js 13+)
+
+import React from 'react';
+
+export default function NotFound() {
+  return (
+    <div>
+      <h1>404 - Page Not Found</h1>
+    </div>
+  );
+}
