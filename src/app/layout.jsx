@@ -1,5 +1,7 @@
+// app/layout.jsx
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Providers } from './Providers';
 import Header from "@/Components/Header";
 import Footer from "@/Components/Footer";
 
@@ -22,9 +24,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <Header />
-        <main className="min-h-screen mt-20">{children}</main>
-        <Footer />
+        <Providers>
+          <Header />
+          <main className="min-h-screen mt-20">{children}</main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
