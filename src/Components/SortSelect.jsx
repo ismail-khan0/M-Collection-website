@@ -1,14 +1,19 @@
 'use client';
-
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { setSort } from '@/app/redux/filtersSlice';
 
 const SortSelect = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const dispatch = useDispatch();
 
   const handleSortChange = (e) => {
+    const sortValue = e.target.value;
+    dispatch(setSort(sortValue));
+    
     const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.set('sort', e.target.value);
+    newSearchParams.set('sort', sortValue);
     router.push(`?${newSearchParams.toString()}`);
   };
 

@@ -74,14 +74,14 @@ const Footer = () => {
           <h2 className="font-bold mb-2">EXPERIENCE MYNTRA APP ON MOBILE</h2>
           <div className="flex space-x-2">
             <Image 
-              src="/Img/Shop-by-Catagory/Google-play.png" 
+              src="/Image/kid.webp" 
               width={128} 
               height={40} 
               alt="Google Play"
               className="w-32"
             />
             <Image 
-              src="/Img/Shop-by-Catagory/Play-store.png" 
+              src="/Image/kid.webp" 
               width={128} 
               height={40} 
               alt="App Store"

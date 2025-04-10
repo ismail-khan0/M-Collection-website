@@ -1,9 +1,11 @@
-'use client';
-import React, { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import logo from '../../public/Image/Logo.jpeg';
-import ProfileDropdown from './ProfileDropdown';
+"use client";
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import logo from "../../public/Image/Logo.jpeg";
+import ProfileDropdown from "./ProfileDropdown";
+import { CiHeart, CiUser } from "react-icons/ci";
+import { PiBagSimpleLight } from "react-icons/pi";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,33 +16,36 @@ export default function Header() {
       className="fixed top-0 left-0 w-full z-50 bg-white border-gray-200 shadow-sm shadow-gray-200/50 dark:bg-gray-900"
     >
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto">
-        <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+        <Link
+          href="/"
+          className="flex items-center space-x-3 rtl:space-x-reverse"
+        >
           <Image className="ml-8 w-16 h-16" src={logo} alt="Logo" />
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"></span>
         </Link>
 
         <div className="flex md:order-2">
-          <ul className="flex gap-4 items-center justify-center mr-2">
-            <li className="relative group md:hidden block">
-              <Link
-                href="/Wishlist"
-                className="block flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:py-4 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-              >
-                <i className="fa-regular fa-heart text-sm"></i>
-                <span className="text-sm">Wishlist</span>
-              </Link>
-            </li>
-            <li className="relative group md:hidden block">
-              <Link
-                href="/Signin"
-                className="block flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:py-4 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-              >
-                <i className="fa-regular fa-user text-sm"></i>
-                <span className="text-sm">Profile</span>
-                <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-red-500 group-hover:w-full"></span>
-              </Link>
-            </li>
-          </ul>
+        <ul className="flex gap-4 items-center justify-center mr-2 md:hidden">
+  <li className="relative group">
+    <Link
+      href="/wishlist"
+      className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 group"
+    >
+      <CiHeart className="text-2xl group-hover:text-red-500" />
+      <span className="text-sm group-hover:text-red-500">Wishlist</span>
+    </Link>
+  </li>
+  <li className="relative group">
+    <Link
+      href="/signin"
+      className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 group"
+    >
+      <CiUser className="text-2xl group-hover:text-red-500" />
+      <span className="text-sm group-hover:text-red-500">Profile</span>
+    </Link>
+  </li>
+</ul>
+
 
           <div className="relative hidden md:block">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -96,7 +101,9 @@ export default function Header() {
         </div>
 
         <div
-          className={`items-center justify-between ${isMenuOpen ? 'block' : 'hidden'} w-full md:flex md:w-auto md:order-1`}
+          className={`items-center justify-between ${
+            isMenuOpen ? "block" : "hidden"
+          } w-full md:flex md:w-auto md:order-1`}
           id="navbar-search"
         >
           <div className="relative mt-0 md:hidden">
@@ -164,7 +171,7 @@ export default function Header() {
                 id="men"
                 className="block relative px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:py-7 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
               >
-              Gifts
+                Gifts
                 <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-yellow-400 group-hover:w-full"></span>
               </Link>
             </li>
@@ -182,36 +189,39 @@ export default function Header() {
           </ul>
         </div>
 
-        <div className="items-center justify-center hidden w-full md:flex md:w-auto md:order-3" id="navbar-search">
-          <ul className="flex flex-row items-center space-x-6 p-0 md:py-0 mt-0 font-medium border border-gray-100 rounded-lg bg-gray-50 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-            <li className="relative group">
-              <div className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:py-4 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
-                <i className="fa-regular fa-user text-lg"></i>
-                <span className="text-sm">Profile</span>
-                <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-red-500 group-hover:w-full"></span>
-              </div>
-            <ProfileDropdown/>
-            </li>
-            <li>
-              <Link
-                href="/Wishlist"
-                className="flex flex-col items-center w-20 h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-              >
-                <i className="fa-regular fa-heart text-lg"></i>
-                <span className="text-sm">Wishlist</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="#"
-                className="flex flex-col items-center w-20 h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-              >
-                <i className="fa-solid fa-bag-shopping text-lg"></i>
-                <span className="text-sm">Bags</span>
-              </Link>
-            </li>
-          </ul>
-        </div>
+        <div
+  className="items-center justify-center hidden w-full md:flex md:w-auto md:order-3 pr-4"
+  id="navbar-search"
+>
+  <ul className="flex flex-row items-center p-0 md:py-0 mt-0 font-medium border border-gray-100 rounded-lg bg-gray-50 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+    <li className="relative group mx-4">
+      <div className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:py-4 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+        <CiUser className="text-3xl group-hover:text-red-500" />
+        <span className="text-sm group-hover:text-red-500">Profile</span>
+        <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-red-500 group-hover:w-full"></span>
+      </div>
+      <ProfileDropdown />
+    </li>
+    <li className="mx-4">
+      <Link
+        href="/wishlist"
+        className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent group"
+      >
+        <CiHeart className="text-3xl group-hover:text-red-500" />
+        <span className="text-sm group-hover:text-red-500">Wishlist</span>
+      </Link>
+    </li>
+    <li className="mx-4">
+      <Link
+        href="#"
+        className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent group"
+      >
+        <PiBagSimpleLight className="text-3xl group-hover:text-red-500" />
+        <span className="text-sm group-hover:text-red-500">Bags</span>
+      </Link>
+    </li>
+  </ul>
+</div>
       </div>
     </nav>
   );

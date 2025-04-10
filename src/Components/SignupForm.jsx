@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { signupStart, signupSuccess, signupFailure } from '../app/redux/authSlice';
 
 export default function SignupForm() {
   const [fullname, setFullname] = useState('');
@@ -8,16 +10,26 @@ export default function SignupForm() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
+    dispatch(signupStart());
 
-    // Simple validation
-    if (password === confirmPassword) {
-      alert('Sign Up successful!');
-      router.push('/'); // Redirect to homepage or dashboard
-    } else {
-      alert('Passwords do not match');
+    try {
+      if (password !== confirmPassword) {
+        dispatch(signupFailure('Passwords do not match'));
+        alert('Passwords do not match');
+        return;
+      }
+
+      // Replace with actual API call
+      const user = { email, name: fullname };
+      dispatch(signupSuccess(user));
+      router.push('/');
+    } catch (error) {
+      dispatch(signupFailure(error.message));
+      alert('Signup failed');
     }
   };
 

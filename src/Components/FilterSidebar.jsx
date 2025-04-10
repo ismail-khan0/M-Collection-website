@@ -144,14 +144,14 @@ const FilterSidebar = () => {
       <div className="mt-4">
         <h3 className="font-semibold">Color</h3>
         <div className="text-sm text-gray-600 space-y-2">
-          {[
-            { id: 'black', name: 'Black', emoji: '⚫' },
-            { id: 'white', name: 'White', emoji: '⚪' },
-            { id: 'blue', name: 'Blue', emoji: '🔵' },
-            { id: 'navy', name: 'Navy Blue', emoji: '🔵' },
-            { id: 'red', name: 'Red', emoji: '🔴' },
-            { id: 'grey', name: 'Grey', emoji: '⚫' },
-            { id: 'maroon', name: 'Maroon', emoji: '🟥' },
+          {[ 
+            { id: 'black', name: 'Black', emoji: '⚫' }, 
+            { id: 'white', name: 'White', emoji: '⚪' }, 
+            { id: 'blue', name: 'Blue', emoji: '🔵' }, 
+            { id: 'navy', name: 'Navy Blue', emoji: '🔵' }, 
+            { id: 'red', name: 'Red', emoji: '🔴' }, 
+            { id: 'grey', name: 'Grey', emoji: '⚫' }, 
+            { id: 'maroon', name: 'Maroon', emoji: '🟥' }, 
             { id: 'brown', name: 'Brown', emoji: '🟫' }
           ].map((color) => (
             <div key={color.id} className="flex items-center gap-2">

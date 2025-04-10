@@ -1,21 +1,32 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { loginStart, loginSuccess, loginFailure } from '../app/redux/authSlice';
 
 export default function SigninForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    dispatch(loginStart());
 
-    // Simple validation for testing, replace with actual logic later
-    if (email === 'test@example.com' && password === 'password') {
-      alert('Login successful!');
-      router.push('/'); // Redirect to homepage or dashboard
-    } else {
-      alert('Invalid credentials');
+    try {
+      // Replace with actual API call
+      if (email === 'test@example.com' && password === 'password') {
+        const user = { email, name: 'Test User' };
+        dispatch(loginSuccess(user));
+        router.push('/');
+      } else {
+        dispatch(loginFailure('Invalid credentials'));
+        alert('Invalid credentials');
+      }
+    } catch (error) {
+      dispatch(loginFailure(error.message));
+      alert('Login failed');
     }
   };
 
