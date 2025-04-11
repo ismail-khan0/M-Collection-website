@@ -1,14 +1,20 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
-const ShopByCategory = ({ apiUrl, title = 'Shop by Category' }) => {
+const ShopByCategory = ({ apiUrl, title = 'Shop by Category',gender = 'men' }) => {
+  
+
   const [products, setProducts] = useState([]);
+  const router = useRouter();
 
-  const redirectToFilter = (category) => {
-    localStorage.setItem('filterCategory', category);
-    window.location.href = '/filter';
+  const redirectToFilter = (categoryId) => {
+    const params = new URLSearchParams();
+    params.set('gender', gender); // dynamic
+    router.push(`/products?${params.toString()}`);
   };
+  
 
   useEffect(() => {
     fetch(apiUrl)

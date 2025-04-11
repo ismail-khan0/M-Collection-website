@@ -1,7 +1,17 @@
 'use client';
 import React from "react";
+import { useRouter } from 'next/navigation';
 
 export default function KidsCategories({ products }) {
+  const router = useRouter();
+
+  const redirectToFilter = (category) => {
+    const params = new URLSearchParams();
+    params.set('gender', 'kids');
+    params.set('category', category);
+    router.push(`/products?${params.toString()}`);
+  };
+
   return (
     <div className="flex flex-col gap-4 my-6">
       <h3 className="text-2xl font-semibold text-gray-700 ml-16 md:ml-24 my-6">Kids Categories</h3>
@@ -10,7 +20,8 @@ export default function KidsCategories({ products }) {
         {products.map((product) => (
           <div
             key={product.id}
-            className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center text-center hover:shadow-lg transition h-full"
+            onClick={() => redirectToFilter(product.category)}
+            className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center text-center hover:shadow-lg transition h-full cursor-pointer"
           >
             <img
               src={product.image}

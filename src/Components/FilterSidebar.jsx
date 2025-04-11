@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 
 const FilterSidebar = () => {
   const router = useRouter();
@@ -12,53 +12,55 @@ const FilterSidebar = () => {
     gender: [],
     category: [],
     brand: [],
-    color: []
+    color: [],
   });
 
-  // Helper function to update query params dynamically
-  const createQueryString = useCallback(
-    (name, value) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value); // Add or update the query parameter
-      return params.toString();
-    },
-    [searchParams]
-  );
+  // Initialize filters from URL params
+  useEffect(() => {
+    const params = {
+      gender: searchParams.getAll("gender"),
+      category: searchParams.getAll("category"),
+      brand: searchParams.getAll("brand"),
+      color: searchParams.getAll("color"),
+    };
+    setSelectedFilters(params);
+  }, [searchParams]);
 
   // Clear all filters and reset to default
   const clearFilters = () => {
-    router.push('/products'); // Reset to the default product page without any filters
+    router.push("/products");
   };
 
-  // Check if a filter is applied based on URL query params
+  // Check if a filter is applied
   const isChecked = (filterName, filterValue) => {
     return selectedFilters[filterName].includes(filterValue);
   };
 
-  // Handle filter change and update the URL query parameters
+  // Handle filter change and update the URL
   const handleFilterChange = (filterName, filterValue) => {
-    // Toggle filter on/off
     const newFilters = { ...selectedFilters };
-    const index = newFilters[filterName].indexOf(filterValue);
+    const currentValues = newFilters[filterName];
 
-    if (index >= 0) {
-      // If filter is already selected, remove it
-      newFilters[filterName].splice(index, 1);
+    // Toggle the filter value
+    if (currentValues.includes(filterValue)) {
+      newFilters[filterName] = currentValues.filter((v) => v !== filterValue);
     } else {
-      // Otherwise, add it
-      newFilters[filterName].push(filterValue);
+      newFilters[filterName] = [...currentValues, filterValue];
     }
 
     setSelectedFilters(newFilters);
 
-    // Update URL query params
-    const queryString = Object.keys(newFilters)
-      .map((key) => {
-        return newFilters[key].map((value) => `${key}=${value}`).join('&');
-      })
-      .join('&');
+    // Create new URLSearchParams
+    const params = new URLSearchParams();
 
-    router.push(`/products?${queryString}`);
+    // Add all active filters to the URL
+    Object.entries(newFilters).forEach(([key, values]) => {
+      values.forEach((value) => {
+        params.append(key, value);
+      });
+    });
+
+    router.push(`/products?${params.toString()}`);
   };
 
   return (
@@ -72,26 +74,20 @@ const FilterSidebar = () => {
       {/* Gender Filter */}
       <div className="mt-4">
         <h3 className="font-semibold">Gender</h3>
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="men-checkbox"
-            checked={isChecked('gender', 'men')}
-            onChange={() => handleFilterChange('gender', 'men')}
-            className="form-checkbox"
-          />
-          <label htmlFor="men-checkbox" className="ml-1">Men</label>
-        </div>
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="women-checkbox"
-            checked={isChecked('gender', 'women')}
-            onChange={() => handleFilterChange('gender', 'women')}
-            className="form-checkbox"
-          />
-          <label htmlFor="women-checkbox" className="ml-1">Women</label>
-        </div>
+        {["men", "women", "kids", "gifts"].map((gender) => (
+          <div key={gender} className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id={`${gender}-checkbox`}
+              checked={isChecked("gender", gender)}
+              onChange={() => handleFilterChange("gender", gender)}
+              className="form-checkbox"
+            />
+            <label htmlFor={`${gender}-checkbox`} className="ml-1 capitalize">
+              {gender}
+            </label>
+          </div>
+        ))}
       </div>
 
       <hr className="mt-4" />
@@ -100,20 +96,27 @@ const FilterSidebar = () => {
       <div className="mt-4">
         <h3 className="font-semibold">Categories</h3>
         <ul className="text-sm text-gray-600 space-y-2">
-          {['Tshirts', 'Shirts', 'Jeans', 'Casual Shoes', 'Trousers', 'Sweatshirts', 'Jackets', 'Shorts'].map(
-            (category) => (
-              <li key={category} className="flex items-center gap-2">
-                <input
-                  id={category.toLowerCase()}
-                  type="checkbox"
-                  checked={isChecked('category', category)}
-                  onChange={() => handleFilterChange('category', category)}
-                  className="form-checkbox"
-                />
-                <label htmlFor={category.toLowerCase()}>{category}</label>
-              </li>
-            )
-          )}
+          {[
+            "Tshirts",
+            "Shirts",
+            "Jeans",
+            "Casual Shoes",
+            "Trousers",
+            "Sweatshirts",
+            "Jackets",
+            "Shorts",
+          ].map((category) => (
+            <li key={category} className="flex items-center gap-2">
+              <input
+                id={category.toLowerCase()}
+                type="checkbox"
+                checked={isChecked("category", category)}
+                onChange={() => handleFilterChange("category", category)}
+                className="form-checkbox"
+              />
+              <label htmlFor={category.toLowerCase()}>{category}</label>
+            </li>
+          ))}
         </ul>
       </div>
 
@@ -123,16 +126,25 @@ const FilterSidebar = () => {
       <div className="mt-4">
         <h3 className="font-semibold">Brands</h3>
         <ul className="text-sm text-gray-600 space-y-2">
-          {['Friskers', 'WOOSTRO', 'FBAR', 'DISPENSER', 'Pepe jeans', 'Masch Sports'].map((brand) => (
+          {[
+            "Friskers",
+            "WOOSTRO",
+            "FBAR",
+            "DISPENSER",
+            "Pepe jeans",
+            "Masch Sports",
+          ].map((brand) => (
             <li key={brand} className="flex items-center gap-2">
               <input
-                id={brand.toLowerCase().replace(' ', '-')}
+                id={brand.toLowerCase().replace(" ", "-")}
                 type="checkbox"
-                checked={isChecked('brand', brand)}
-                onChange={() => handleFilterChange('brand', brand)}
+                checked={isChecked("brand", brand)}
+                onChange={() => handleFilterChange("brand", brand)}
                 className="form-checkbox"
               />
-              <label htmlFor={brand.toLowerCase().replace(' ', '-')}>{brand}</label>
+              <label htmlFor={brand.toLowerCase().replace(" ", "-")}>
+                {brand}
+              </label>
             </li>
           ))}
         </ul>
@@ -144,28 +156,32 @@ const FilterSidebar = () => {
       <div className="mt-4">
         <h3 className="font-semibold">Color</h3>
         <div className="text-sm text-gray-600 space-y-2">
-          {[ 
-            { id: 'black', name: 'Black', emoji: '⚫' }, 
-            { id: 'white', name: 'White', emoji: '⚪' }, 
-            { id: 'blue', name: 'Blue', emoji: '🔵' }, 
-            { id: 'navy', name: 'Navy Blue', emoji: '🔵' }, 
-            { id: 'red', name: 'Red', emoji: '🔴' }, 
-            { id: 'grey', name: 'Grey', emoji: '⚫' }, 
-            { id: 'maroon', name: 'Maroon', emoji: '🟥' }, 
-            { id: 'brown', name: 'Brown', emoji: '🟫' }
+          {[
+            { id: "black", name: "Black", emoji: "⚫" },
+            { id: "white", name: "White", emoji: "⚪" },
+            { id: "blue", name: "Blue", emoji: "🔵" },
+            { id: "navy", name: "Navy Blue", emoji: "🔵" },
+            { id: "red", name: "Red", emoji: "🔴" },
+            { id: "grey", name: "Grey", emoji: "⚫" },
+            { id: "maroon", name: "Maroon", emoji: "🟥" },
+            { id: "brown", name: "Brown", emoji: "🟫" },
           ].map((color) => (
             <div key={color.id} className="flex items-center gap-2">
               <input
                 type="checkbox"
                 id={color.id}
-                checked={isChecked('color', color.name)}
-                onChange={() => handleFilterChange('color', color.name)}
+                checked={isChecked("color", color.name)}
+                onChange={() => handleFilterChange("color", color.name)}
                 className="form-checkbox"
               />
-              <label htmlFor={color.id} className="ml-1">{color.emoji} {color.name}</label>
+              <label htmlFor={color.id} className="ml-1">
+                {color.emoji} {color.name}
+              </label>
             </div>
           ))}
-          <p className="text-pink-500 mt-2">Other color filters can be added...</p>
+          <p className="text-pink-500 mt-2">
+            Other color filters can be added...
+          </p>
         </div>
       </div>
     </aside>
