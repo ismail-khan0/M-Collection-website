@@ -15,7 +15,7 @@ export default function SigninForm() {
     dispatch(loginStart());
 
     try {
-      // Replace with actual API call
+      
       if (email === 'test@example.com' && password === 'password') {
         const user = { email, name: 'Test User' };
         dispatch(loginSuccess(user));

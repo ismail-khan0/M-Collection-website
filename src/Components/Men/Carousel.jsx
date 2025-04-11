@@ -2,11 +2,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
+import { useRouter } from 'next/navigation';
 
-const Carousel = ({ apiUrl, sectionTitle = 'Men' }) => {
+const Carousel = ({ apiUrl, sectionTitle = 'Men', gender = 'men' }) => {
   const [products, setProducts] = useState([]);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
-
+  const router = useRouter();
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -25,9 +26,11 @@ const Carousel = ({ apiUrl, sectionTitle = 'Men' }) => {
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   const redirectToFilter = () => {
-    window.location.href = '/filter';
+    const params = new URLSearchParams();
+    params.set('gender', gender); // use prop
+    router.push(`/products?${params.toString()}`);
   };
-
+  
   return (
     <div>
       <title>{sectionTitle}</title>

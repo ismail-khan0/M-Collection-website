@@ -10,9 +10,10 @@ const filtersSlice = createSlice({
     sort: 'recommended',
   },
   reducers: {
-    setGenderFilter: (state, action) => {
-      state.gender = action.payload;
-    },
+  // The existing reducer should work fine as is
+setGenderFilter: (state, action) => {
+  state.gender = action.payload;
+},
     setCategoryFilter: (state, action) => {
       state.category = action.payload;
     },

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-const CategoryGrid = ({ apiUrl,start,end, sectionTitle = 'Browse Categories' }) => {
+const CategoryGrid = ({ apiUrl, start, end, gender = 'men', sectionTitle = 'Browse Categories' }) => {
   const [categories, setCategories] = useState([]);
   const router = useRouter();
 
@@ -22,8 +22,11 @@ const CategoryGrid = ({ apiUrl,start,end, sectionTitle = 'Browse Categories' }) 
   }, [apiUrl]);
 
   const redirectToFilter = (categoryId) => {
-    router.push(`/filter?id=${categoryId}`);
+    const params = new URLSearchParams();
+    params.set('gender', gender); // dynamic
+    router.push(`/products?${params.toString()}`);
   };
+  
 
   return (
     <div id="Home_imgs" className="py-10 px-4 bg-white">

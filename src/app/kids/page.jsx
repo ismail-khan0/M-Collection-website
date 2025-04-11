@@ -4,7 +4,7 @@ import AdBanner from "@/Components/AdBanner";
 import FavoriteBrands from "@/Components/FavoriteBrands";
 import IconicBrands from "@/Components/IconicBrands";
 import KidsCategories from "@/Components/KidsCategories";
-import ExploreMore from "@/components/ExploreMore";
+import ExploreMore from "@/Components/ExploreMore";
 
 
 export default async function KidsPage() {

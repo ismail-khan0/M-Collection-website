@@ -29,23 +29,61 @@ const productsSlice = createSlice({
     error: null,
   },
   reducers: {
-    filterProducts: (state, action) => {
-      const { gender, category, brand, color, sort } = action.payload;
-      let filtered = [...state.items];
-      
-      if (gender) filtered = filtered.filter(p => p.gender.toLowerCase() === gender.toLowerCase());
-      if (category) filtered = filtered.filter(p => p.category.toLowerCase() === category.toLowerCase());
-      if (brand) filtered = filtered.filter(p => p.brand.toLowerCase() === brand.toLowerCase());
-      if (color) filtered = filtered.filter(p => p.color.toLowerCase() === color.toLowerCase());
-      
-      if (sort === 'low-high') {
-        filtered.sort((a, b) => parseFloat(a.discountPrice.replace("$", "")) - parseFloat(b.discountPrice.replace("$", "")));
-      } else if (sort === 'high-low') {
-        filtered.sort((a, b) => parseFloat(b.discountPrice.replace("$", "")) - parseFloat(a.discountPrice.replace("$", "")));
-      }
-      
-      state.filteredItems = filtered;
-    },
+   // In your filterProducts reducer, modify the gender filtering part:
+   filterProducts: (state, action) => {
+    const params = action.payload;
+    let filtered = [...state.items];
+    
+    // Gender filter - handle multiple selections
+    if (params.gender && params.gender.length > 0) {
+      filtered = filtered.filter(p => 
+        params.gender.some(g => p.gender.toLowerCase() === g.toLowerCase())
+      );
+    }
+    
+    // Category filter - handle multiple selections
+    if (params.category && params.category.length > 0) {
+      filtered = filtered.filter(p => 
+        params.category.some(c => 
+          p.category.toLowerCase() === c.toLowerCase()
+        )
+      );
+    }
+    
+    // Brand filter - handle multiple selections
+    if (params.brand && params.brand.length > 0) {
+      filtered = filtered.filter(p => 
+        params.brand.some(b => 
+          p.brand.toLowerCase() === b.toLowerCase()
+        )
+      );
+    }
+    
+    // Color filter - handle multiple selections
+    if (params.color && params.color.length > 0) {
+      filtered = filtered.filter(p => 
+        params.color.some(col => 
+          p.color.toLowerCase() === col.toLowerCase()
+        )
+      );
+    }
+    
+    // Sorting
+    if (params.sort === 'low-high') {
+      filtered.sort((a, b) => 
+        parseFloat(a.discountPrice.replace("$", "")) - 
+        parseFloat(b.discountPrice.replace("$", ""))
+      );
+    } else if (params.sort === 'high-low') {
+      filtered.sort((a, b) => 
+        parseFloat(b.discountPrice.replace("$", "")) - 
+        parseFloat(a.discountPrice.replace("$", ""))
+      );
+    }
+    
+    state.filteredItems = filtered;
+    state.status = 'succeeded';
+  }
   },
   extraReducers: (builder) => {
     builder
