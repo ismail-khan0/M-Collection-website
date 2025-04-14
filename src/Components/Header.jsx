@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { searchProducts } from "./../app/redux/productsSlice";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "../../public/Image/Logo.jpeg";
@@ -9,7 +11,14 @@ import { PiBagSimpleLight } from "react-icons/pi";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const dispatch = useDispatch();
 
+  const handleSearch = (event) => {
+    const value = event.target.value;
+    setQuery(value);
+    dispatch(searchProducts(value)); // Dispatch the search action
+  };
   return (
     <nav
       id="header"
@@ -25,27 +34,30 @@ export default function Header() {
         </Link>
 
         <div className="flex md:order-2">
-        <ul className="flex gap-4 items-center justify-center mr-2 md:hidden">
-  <li className="relative group">
-    <Link
-      href="/wishlist"
-      className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 group"
-    >
-      <CiHeart className="text-2xl group-hover:text-red-500" />
-      <span className="text-sm group-hover:text-red-500">Wishlist</span>
-    </Link>
-  </li>
-  <li className="relative group">
-    <Link
-      href="/signin"
-      className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 group"
-    >
-      <CiUser className="text-2xl group-hover:text-red-500" />
-      <span className="text-sm group-hover:text-red-500">Profile</span>
-    </Link>
-  </li>
-</ul>
-
+          <ul className="flex gap-4 items-center justify-center mr-2 md:hidden">
+            <li className="relative group">
+              <Link
+                href="/wishlist"
+                className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 group"
+              >
+                <CiHeart className="text-2xl group-hover:text-red-500" />
+                <span className="text-sm group-hover:text-red-500">
+                  Wishlist
+                </span>
+              </Link>
+            </li>
+            <li className="relative group">
+              <Link
+                href="/signin"
+                className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 group"
+              >
+                <CiUser className="text-2xl group-hover:text-red-500" />
+                <span className="text-sm group-hover:text-red-500">
+                  Profile
+                </span>
+              </Link>
+            </li>
+          </ul>
 
           <div className="relative hidden md:block">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -69,6 +81,8 @@ export default function Header() {
             <input
               type="text"
               id="search-navbar"
+              value={query}
+              onChange={handleSearch}
               className="block w-[350px] p-[10px] ps-10 text-sm text-gray-900 bg-gray-100 border rounded-sm focus:ring-none focus:border-black focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Search for products, brands and more"
             />
@@ -190,38 +204,42 @@ export default function Header() {
         </div>
 
         <div
-  className="items-center justify-center hidden w-full md:flex md:w-auto md:order-3 pr-4"
-  id="navbar-search"
->
-  <ul className="flex flex-row items-center p-0 md:py-0 mt-0 font-medium border border-gray-100 rounded-lg bg-gray-50 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-    <li className="relative group mx-4">
-      <div className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:py-4 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
-        <CiUser className="text-3xl group-hover:text-red-500" />
-        <span className="text-sm group-hover:text-red-500">Profile</span>
-        <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-red-500 group-hover:w-full"></span>
-      </div>
-      <ProfileDropdown />
-    </li>
-    <li className="mx-4">
-      <Link
-        href="/wishlist"
-        className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent group"
-      >
-        <CiHeart className="text-3xl group-hover:text-red-500" />
-        <span className="text-sm group-hover:text-red-500">Wishlist</span>
-      </Link>
-    </li>
-    <li className="mx-4">
-      <Link
-        href="#"
-        className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent group"
-      >
-        <PiBagSimpleLight className="text-3xl group-hover:text-red-500" />
-        <span className="text-sm group-hover:text-red-500">Bags</span>
-      </Link>
-    </li>
-  </ul>
-</div>
+          className="items-center justify-center hidden w-full md:flex md:w-auto md:order-3 pr-4"
+          id="navbar-search"
+        >
+          <ul className="flex flex-row items-center p-0 md:py-0 mt-0 font-medium border border-gray-100 rounded-lg bg-gray-50 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <li className="relative group mx-4">
+              <div className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:py-4 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+                <CiUser className="text-3xl group-hover:text-red-500" />
+                <span className="text-sm group-hover:text-red-500">
+                  Profile
+                </span>
+                <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-red-500 group-hover:w-full"></span>
+              </div>
+              <ProfileDropdown />
+            </li>
+            <li className="mx-4">
+              <Link
+                href="/wishlist"
+                className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent group"
+              >
+                <CiHeart className="text-3xl group-hover:text-red-500" />
+                <span className="text-sm group-hover:text-red-500">
+                  Wishlist
+                </span>
+              </Link>
+            </li>
+            <li className="mx-4">
+              <Link
+                href="/products"
+                className="flex flex-col items-center h-auto py-0 gap-0 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent group"
+              >
+                <PiBagSimpleLight className="text-3xl group-hover:text-red-500" />
+                <span className="text-sm group-hover:text-red-500">Bags</span>
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
   );

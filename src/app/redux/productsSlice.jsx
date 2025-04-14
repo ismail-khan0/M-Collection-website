@@ -29,61 +29,74 @@ const productsSlice = createSlice({
     error: null,
   },
   reducers: {
-   // In your filterProducts reducer, modify the gender filtering part:
-   filterProducts: (state, action) => {
-    const params = action.payload;
-    let filtered = [...state.items];
-    
-    // Gender filter - handle multiple selections
-    if (params.gender && params.gender.length > 0) {
-      filtered = filtered.filter(p => 
-        params.gender.some(g => p.gender.toLowerCase() === g.toLowerCase())
-      );
+    searchProducts: (state, action) => {
+      const searchTerm = action.payload.toLowerCase().trim();
+      if (!searchTerm) {
+        state.filteredItems = state.items;
+      } else {
+        state.filteredItems = state.items.filter(product => 
+          product.name.toLowerCase().includes(searchTerm) ||
+          product.category.toLowerCase().includes(searchTerm) ||
+          product.brand.toLowerCase().includes(searchTerm) ||
+          product.color.toLowerCase().includes(searchTerm) ||
+          product.gender.toLowerCase().includes(searchTerm)
+        );
+      }
+    },
+    filterProducts: (state, action) => {
+      const params = action.payload;
+      let filtered = [...state.items];
+      
+      // Gender filter - handle multiple selections
+      if (params.gender && params.gender.length > 0) {
+        filtered = filtered.filter(p => 
+          params.gender.some(g => p.gender.toLowerCase() === g.toLowerCase())
+        );
+      }
+      
+      // Category filter - handle multiple selections
+      if (params.category && params.category.length > 0) {
+        filtered = filtered.filter(p => 
+          params.category.some(c => 
+            p.category.toLowerCase() === c.toLowerCase()
+          )
+        );
+      }
+      
+      // Brand filter - handle multiple selections
+      if (params.brand && params.brand.length > 0) {
+        filtered = filtered.filter(p => 
+          params.brand.some(b => 
+            p.brand.toLowerCase() === b.toLowerCase()
+          )
+        );
+      }
+      
+      // Color filter - handle multiple selections
+      if (params.color && params.color.length > 0) {
+        filtered = filtered.filter(p => 
+          params.color.some(col => 
+            p.color.toLowerCase() === col.toLowerCase()
+          )
+        );
+      }
+      
+      // Sorting
+      if (params.sort === 'low-high') {
+        filtered.sort((a, b) => 
+          parseFloat(a.discountPrice.replace("$", "")) - 
+          parseFloat(b.discountPrice.replace("$", ""))
+        );
+      } else if (params.sort === 'high-low') {
+        filtered.sort((a, b) => 
+          parseFloat(b.discountPrice.replace("$", "")) - 
+          parseFloat(a.discountPrice.replace("$", ""))
+        );
+      }
+      
+      state.filteredItems = filtered;
+      state.status = 'succeeded';
     }
-    
-    // Category filter - handle multiple selections
-    if (params.category && params.category.length > 0) {
-      filtered = filtered.filter(p => 
-        params.category.some(c => 
-          p.category.toLowerCase() === c.toLowerCase()
-        )
-      );
-    }
-    
-    // Brand filter - handle multiple selections
-    if (params.brand && params.brand.length > 0) {
-      filtered = filtered.filter(p => 
-        params.brand.some(b => 
-          p.brand.toLowerCase() === b.toLowerCase()
-        )
-      );
-    }
-    
-    // Color filter - handle multiple selections
-    if (params.color && params.color.length > 0) {
-      filtered = filtered.filter(p => 
-        params.color.some(col => 
-          p.color.toLowerCase() === col.toLowerCase()
-        )
-      );
-    }
-    
-    // Sorting
-    if (params.sort === 'low-high') {
-      filtered.sort((a, b) => 
-        parseFloat(a.discountPrice.replace("$", "")) - 
-        parseFloat(b.discountPrice.replace("$", ""))
-      );
-    } else if (params.sort === 'high-low') {
-      filtered.sort((a, b) => 
-        parseFloat(b.discountPrice.replace("$", "")) - 
-        parseFloat(a.discountPrice.replace("$", ""))
-      );
-    }
-    
-    state.filteredItems = filtered;
-    state.status = 'succeeded';
-  }
   },
   extraReducers: (builder) => {
     builder
@@ -102,5 +115,5 @@ const productsSlice = createSlice({
   },
 });
 
-export const { filterProducts } = productsSlice.actions;
+export const { searchProducts, filterProducts } = productsSlice.actions;
 export default productsSlice.reducer;

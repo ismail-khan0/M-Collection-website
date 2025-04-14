@@ -1,9 +1,13 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../app/redux/authSlice'; // Adjust the path as per your folder structure
 
 export default function ProfileDropdown() {
   const [open, setOpen] = useState(false);
+  const dispatch = useDispatch();
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
 
   return (
     <div
@@ -11,14 +15,28 @@ export default function ProfileDropdown() {
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
-      <h1 className="font-bold text-xl mb-1">Welcome</h1>
-      <p className="text-sm text-[#535665]">To access your account & manage orders</p>
+      <h1 className="font-bold text-xl mb-1">
+        {isAuthenticated && user?.name ? `Hi, ${user.name}` : 'Welcome'}
+      </h1>
+      <p className="text-sm text-[#535665]">
+        {isAuthenticated ? 'Glad to see you back!' : 'To access your account & manage orders'}
+      </p>
+
       <div className="mt-3">
-        <Link href="/signin">
-          <button className="w-full py-1 px-4 text-red-600 border border-red-600 rounded-sm hover:bg-red-50">
-            Log In / Sign Up
+        {isAuthenticated ? (
+          <button
+            className="w-full py-1 px-4 text-red-600 border border-red-600 rounded-sm hover:bg-red-50"
+            onClick={() => dispatch(logout())}
+          >
+            Logout
           </button>
-        </Link>
+        ) : (
+          <Link href="/signin">
+            <button className="w-full py-1 px-4 text-red-600 border border-red-600 rounded-sm hover:bg-red-50">
+              Profile
+            </button>
+          </Link>
+        )}
       </div>
 
       <hr className="my-3" />

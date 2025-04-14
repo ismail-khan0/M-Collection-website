@@ -18,4 +18,4 @@ const wishlistSlice = createSlice({
 });
 
 export const { toggleWishlistItem } = wishlistSlice.actions;
-export default wishlistSlice.reducer;
+export default wishlistSlice.reducer
