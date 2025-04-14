@@ -1,26 +1,27 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+"use client";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
-const ShopByCategory = ({ apiUrl, title = 'Shop by Category',gender = 'men' }) => {
-  
-
+const ShopByCategory = ({
+  apiUrl,
+  title = "Shop by Category",
+  gender = "men",
+}) => {
   const [products, setProducts] = useState([]);
   const router = useRouter();
 
   const redirectToFilter = (categoryId) => {
     const params = new URLSearchParams();
-    params.set('gender', gender); // dynamic
+    params.set("gender", gender); // dynamic
     router.push(`/products?${params.toString()}`);
   };
-  
 
   useEffect(() => {
     fetch(apiUrl)
       .then((res) => res.json())
       .then((data) => setProducts(data))
-      .catch((err) => console.error('Failed to fetch products:', err));
+      .catch((err) => console.error("Failed to fetch products:", err));
   }, [apiUrl]);
 
   return (
@@ -47,10 +48,15 @@ const ShopByCategory = ({ apiUrl, title = 'Shop by Category',gender = 'men' }) =
                 />
               </div>
 
-              <div className="bg-red-600 text-white text-center py-3 px-2">
-                <p className="text-sm font-medium">Casual Wear</p>
-                <p className="text-xl font-extrabold mt-1">40-80% OFF</p>
-                <p className="text-sm mt-1 font-semibold">Shop Now</p>
+              <div className="w-full h-32 bg-red-600 text-white flex flex-col justify-between p-3 text-center">
+                <div>
+                  <p className="text-sm font-medium">{product.title}</p>
+                </div>
+
+                <div>
+                  <p className="text-xl font-extrabold">{product.price}</p>
+                  <p className="text-sm font-semibold">Shop Now</p>
+                </div>
               </div>
             </div>
           ))}

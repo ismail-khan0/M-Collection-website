@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { signupStart, signupSuccess, signupFailure } from '../app/redux/authSlice';
+import SocialAuthButtons from './SocialAuthButtons';
 
 export default function SignupForm() {
   const [fullname, setFullname] = useState('');
@@ -15,96 +16,150 @@ export default function SignupForm() {
   const handleSignup = async (e) => {
     e.preventDefault();
     dispatch(signupStart());
-
+  
     try {
       if (password !== confirmPassword) {
         dispatch(signupFailure('Passwords do not match'));
         alert('Passwords do not match');
         return;
       }
-
-      // Replace with actual API call
-      const user = { email, name: fullname };
-      dispatch(signupSuccess(user));
+  
+      const existingUser = JSON.parse(localStorage.getItem('user'));
+  
+      if (existingUser && existingUser.email === email) {
+        dispatch(signupFailure('Email already exists'));
+        alert('Email already exists');
+        return;
+      }
+  
+      const newUser = { email, name: fullname, password };
+      localStorage.setItem('user', JSON.stringify(newUser));
+      dispatch(signupSuccess(newUser));
       router.push('/');
     } catch (error) {
       dispatch(signupFailure(error.message));
       alert('Signup failed');
     }
   };
+  
 
   return (
-    <div id="signup-page" className="min-h-screen flex flex-col mt-16 mb-4">
-      <div className="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2">
-        <div className="bg-white px-6 py-2 rounded shadow-md text-black w-full">
-          <h1 className="mb-8 text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-            Sign up
-          </h1>
-          <form onSubmit={handleSignup}>
-            <input
-              type="text"
-              className="block border border-grey-light w-full p-3 rounded mb-4"
-              name="fullname"
-              placeholder="Full Name"
-              value={fullname}
-              onChange={(e) => setFullname(e.target.value)}
-              required
-            />
-            <input
-              type="email"
-              className="block border border-grey-light w-full p-3 rounded mb-4"
-              name="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              className="block border border-grey-light w-full p-3 rounded mb-4"
-              name="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              className="block border border-grey-light w-full p-3 rounded mb-4"
-              name="confirm_password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-            <button
-              type="submit"
-              className="w-full text-center py-3 rounded bg-green text-white hover:bg-green-dark focus:outline-none bg-red-500 my-1"
-            >
-              Create Account
-            </button>
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Create your account
+        </h2>
+      </div>
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <form className="space-y-6" onSubmit={handleSignup}>
+            <div>
+              <label htmlFor="fullname" className="block text-sm font-medium text-gray-700">
+                Full Name
+              </label>
+              <div className="mt-1">
+                <input
+                  id="fullname"
+                  name="fullname"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  value={fullname}
+                  onChange={(e) => setFullname(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email address
+              </label>
+              <div className="mt-1">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="mt-1">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                Confirm Password
+              </label>
+              <div className="mt-1">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Sign up
+              </button>
+            </div>
           </form>
-          <div className="text-center text-sm text-grey-dark mt-4">
-            By signing up, you agree to the
-            <a className="no-underline border-b border-grey-dark text-grey-dark" href="#">
-              Terms of Service
-            </a>{' '}
-            and
-            <a className="no-underline border-b border-grey-dark text-grey-dark" href="#">
-              Privacy Policy
-            </a>
+
+          <SocialAuthButtons isSignup={true} />
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">
+                  By signing up, you agree to our
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-2 text-center text-sm text-gray-600">
+              <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                Terms of Service
+              </a>{' '}
+              and{' '}
+              <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                Privacy Policy
+              </a>
+            </div>
           </div>
-        </div>
-        <div className="text-grey-dark mt-6">
-          Already have an account?{' '}
-          <button
-            id="go-to-login"
-            onClick={() => router.push('/signin')}
-            className="no-underline border-b border-blue text-blue"
-          >
-            Log in
-          </button>
-          .
         </div>
       </div>
     </div>

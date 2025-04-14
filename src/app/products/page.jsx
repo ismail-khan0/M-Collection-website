@@ -71,15 +71,15 @@ const CategoryPage = () => {
 
   const redirectToFilter = (category) => {
     const params = new URLSearchParams();
-    params.append('gender', 'men'); // 👈 Set gender
-    params.append('category', category); // 👈 Optional: also add category if needed
+    params.append('gender', 'men'); // Set gender
+    params.append('category', category); //  Optional: also add category if needed
     window.location.href = `/filter?${params.toString()}`;
   };
   
   return (
-    <div className="bg-gray-100 p-2">
+    <div className="bg-gray-100 p-2 ">
       <div className="container mx-auto">
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 mt-20">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 mt-4">
           <h1 className="text-xl font-semibold mb-2 sm:mb-0">{categoryName}</h1>
           <SortSelect />
         </div>
