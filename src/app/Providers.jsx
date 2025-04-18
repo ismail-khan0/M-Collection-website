@@ -1,29 +1,36 @@
-'use client';
-
-import { Provider } from 'react-redux';
-import { store } from './redux/store';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { loginSuccess } from './redux/authSlice'; // ✅ corrected
+"use client";
+import { SessionProvider, useSession } from "next-auth/react";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { loginSuccess, logout } from "./redux/authSlice";
 
 function AuthInitializer() {
   const dispatch = useDispatch();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser) {
-      dispatch(loginSuccess(storedUser));
+    if (status === 'authenticated' && session?.user) {
+      dispatch(loginSuccess({
+        email: session.user.email,
+        name: session.user.name
+      }));
+    } else if (status === 'unauthenticated') {
+      dispatch(logout());
     }
-  }, [dispatch]);
+  }, [session, status, dispatch]);
 
   return null;
 }
 
 export function Providers({ children }) {
   return (
-    <Provider store={store}>
-      <AuthInitializer />
-      {children}
-    </Provider>
+    <SessionProvider>
+      <Provider store={store}>
+        <AuthInitializer />
+        {children}
+      </Provider>
+    </SessionProvider>
   );
 }
