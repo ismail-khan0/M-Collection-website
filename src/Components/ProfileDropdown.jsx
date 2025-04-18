@@ -48,6 +48,30 @@ export default function ProfileDropdown() {
           </button>
         </Link>
       )}
+
+<hr className="my-3" />
+
+<div>
+  <ul className="space-y-1 text-sm">
+    <li><Link href="#">Orders</Link></li>
+    <li><Link href="#">Wishlist</Link></li>
+    <li><Link href="#">Gift Cards</Link></li>
+    <li><Link href="#">Contact Us</Link></li>
+    <li><Link href="#">Myntra Insider</Link></li>
+  </ul>
+</div>
+
+<hr className="my-3" />
+
+<div>
+  <ul className="space-y-1 text-sm">
+    <li><Link href="#">Myntra Credit</Link></li>
+    <li><Link href="#">Coupons</Link></li>
+    <li><Link href="#">Saved Cards</Link></li>
+    <li><Link href="#">Saved VPA</Link></li>
+    <li><Link href="#">Saved Addresses</Link></li>
+  </ul>
+</div>
     </div>
   );
 }
