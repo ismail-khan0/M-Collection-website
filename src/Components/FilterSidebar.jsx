@@ -16,15 +16,16 @@ const FilterSidebar = () => {
   });
 
   // Initialize filters from URL params
-  useEffect(() => {
-    const params = {
-      gender: searchParams.getAll("gender"),
-      category: searchParams.getAll("category"),
-      brand: searchParams.getAll("brand"),
-      color: searchParams.getAll("color"),
-    };
-    setSelectedFilters(params);
-  }, [searchParams]);
+// In FilterSidebar component
+useEffect(() => {
+  const params = {
+    gender: searchParams.getAll("gender").map(g => g.toLowerCase()),
+    category: searchParams.getAll("category").map(c => c.toLowerCase()),
+    brand: searchParams.getAll("brand").map(b => b.toLowerCase()),
+    color: searchParams.getAll("color").map(c => c.toLowerCase()),
+  };
+  setSelectedFilters(params);
+}, [searchParams]);
 
   // Clear all filters and reset to default
   const clearFilters = () => {
@@ -32,9 +33,12 @@ const FilterSidebar = () => {
   };
 
   // Check if a filter is applied
-  const isChecked = (filterName, filterValue) => {
-    return selectedFilters[filterName].includes(filterValue);
-  };
+// In FilterSidebar component
+const isChecked = (filterName, filterValue) => {
+  return selectedFilters[filterName]
+    .map(item => item.toLowerCase())
+    .includes(filterValue.toLowerCase());
+};
 
   // Handle filter change and update the URL
   const handleFilterChange = (filterName, filterValue) => {
@@ -97,14 +101,18 @@ const FilterSidebar = () => {
         <h3 className="font-semibold">Categories</h3>
         <ul className="text-sm text-gray-600 space-y-2">
           {[
-            "Tshirts",
+            "T-Shirts",
             "Shirts",
             "Jeans",
-            "Casual Shoes",
             "Trousers",
-            "Sweatshirts",
-            "Jackets",
             "Shorts",
+            "Jackets",
+            "Sweatshirts",
+            "Shoes",
+            "Accessories",
+            "Watches",
+            "Bags",
+            "Sunglasses",
           ].map((category) => (
             <li key={category} className="flex items-center gap-2">
               <input
@@ -127,12 +135,17 @@ const FilterSidebar = () => {
         <h3 className="font-semibold">Brands</h3>
         <ul className="text-sm text-gray-600 space-y-2">
           {[
-            "Friskers",
-            "WOOSTRO",
-            "FBAR",
-            "DISPENSER",
-            "Pepe jeans",
-            "Masch Sports",
+            "Nike",
+            "Adidas",
+            "Puma",
+            "Levi's",
+            "H&M",
+            "Zara",
+            "Gucci",
+            "Dior",
+            "Louis Vuitton",
+            "Tommy Hilfiger",
+            "Calvin Klein",
           ].map((brand) => (
             <li key={brand} className="flex items-center gap-2">
               <input

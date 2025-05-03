@@ -29,7 +29,7 @@ const handler = NextAuth({
             return null;
           }
 
-          // ✅ Return user object to establish session
+          //  Return user object to establish session
           return {
             id: user._id.toString(),
             name: user.fullname,

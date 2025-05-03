@@ -192,11 +192,11 @@ export default function Header() {
 
             <li className="relative group">
               <Link
-                href="#"
+                href="/inputData"
                 id="Kids"
                 className="block relative px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:py-7 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
               >
-                Studio
+                InputForm
                 <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-red-500 group-hover:w-full"></span>
               </Link>
             </li>

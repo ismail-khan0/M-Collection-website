@@ -3,26 +3,59 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-const ShopByCategory = ({
-  apiUrl,
-  title = "Shop by Category",
-  gender = "men",
-}) => {
+const ShopByCategory = ({ title = "Shop by Category", gender = "men" }) => {
   const [products, setProducts] = useState([]);
   const router = useRouter();
 
-  const redirectToFilter = (categoryId) => {
-    const params = new URLSearchParams();
-    params.set("gender", gender); // dynamic
-    router.push(`/products?${params.toString()}`);
-  };
-
   useEffect(() => {
-    fetch(apiUrl)
-      .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error("Failed to fetch products:", err));
-  }, [apiUrl]);
+    const fetchProducts = async () => {
+      try {
+        const url = gender 
+          ? `/api/products?showInShopByCategory=true&gender=${gender}`
+          : '/api/products?showInShopByCategory=true';
+        
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.success && Array.isArray(data.products)) {
+          const categoriesMap = new Map();
+          data.products.forEach((product) => {
+            // Ensure product has a category before adding to map
+            if (product?.category) {
+              categoriesMap.set(product.category, product);
+            }
+          });
+          setProducts(Array.from(categoriesMap.values()));
+        } else {
+          console.error("Unexpected product response format.");
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error("Error fetching product data:", error);
+        setProducts([]);
+      }
+    };
+
+    fetchProducts();
+  }, [gender]);
+
+ // In Carousel, CategoryGrid, and ShopByCategory components
+const redirectToFilter = (productOrCategory) => {
+  const params = new URLSearchParams();
+  
+  // Handle both cases where we might get a product object or just a category string
+  const category = typeof productOrCategory === 'string' 
+    ? productOrCategory 
+    : productOrCategory?.category || '';
+  
+  // Always set the gender prop that was passed to the component
+  if (gender) params.set('gender', gender.toLowerCase());
+  
+  // Set category if available
+  if (category) params.set('category', category.trim().toLowerCase());
+  
+  router.push(`/products?${params.toString()}`);
+};
 
   return (
     <div id="Shop-Category" className="py-10 bg-gray-100">
@@ -31,32 +64,33 @@ const ShopByCategory = ({
           {title}
         </h1>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-          {products.slice(0, 12).map((product) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {products.map((product) => (
             <div
-              key={product.id}
-              onClick={() => redirectToFilter(product.title)}
-              className="bg-white border-4 border-red-500 overflow-hidden shadow hover:scale-105 transition-all cursor-pointer"
+              key={product._id || product.id}
+              onClick={() => redirectToFilter(product)}
+              className="bg-white border-8 border-red-500 overflow-hidden shadow-sm cursor-pointer flex flex-col group"
             >
-              <div className="w-full aspect-[3/4] relative bg-white p-8">
+              <div className="relative w-full aspect-[3/4] overflow-hidden">
                 <Image
-                  src={product.image}
-                  alt={product.title}
+                  src={product.image || '/default-product-image.png'}
+                  alt={product.title || 'Product image'}
                   fill
-                  className="p-2"
+                  className="object-contain transition-transform duration-300 ease-in-out group-hover:scale-105"
                   sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/default-product-image.png';
+                  }}
                 />
               </div>
 
-              <div className="w-full h-32 bg-red-600 text-white flex flex-col justify-between p-3 text-center">
-                <div>
-                  <p className="text-sm font-medium">{product.title}</p>
-                </div>
-
-                <div>
-                  <p className="text-xl font-extrabold">{product.price}</p>
-                  <p className="text-sm font-semibold">Shop Now</p>
-                </div>
+              <div className="bg-red-500 text-white flex flex-col justify-center items-center p-2 gap-1">
+                <p className="text-sm font-semibold">{product.category || 'Category'}</p>
+                <p className="text-lg font-extrabold">
+                  {product.discountPrice || 0} % OFF
+                </p>
+                <p className="text-sm font-semibold">Shop Now</p>
               </div>
             </div>
           ))}

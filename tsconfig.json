@@ -34,7 +34,7 @@
     "src/Components/**/*.jsx", // Ensure .jsx files under src/Components are included
     "src/app/**/*.js",  // Ensure .js files under src/app are included
     "src/app/**/*.jsx"  // Ensure .jsx files under src/app are included
-  ],
+, "next.config.js"  ],
   "exclude": [
     "node_modules"
   ]

@@ -11,7 +11,7 @@ const MenPage = () => (
   <div className="bg-gray-100 font-sans mx-4">
     <main>
       <HeroSection image1={image1} image2={image2} />
-      <CategoryGrid apiUrl={MEN_API} start="0" end="6" gender="men" />
+      <CategoryGrid apiUrl={MEN_API} start="0" end="14" gender="men" />
       <Carousel apiUrl={MEN_API} sectionTitle="Men" gender="men" />
       <ShopByCategory apiUrl={MEN_API} gender="men" />
     </main>

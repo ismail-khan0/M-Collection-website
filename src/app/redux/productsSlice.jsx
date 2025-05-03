@@ -1,22 +1,29 @@
+// productsSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
-  async () => {
-    const response = await fetch('https://fakestoreapi.com/products');
-    const data = await response.json();
-    
-    return data.map(product => ({
-      id: product.id,
-      name: product.title,
-      image: product.image,
-      price: `$${(product.price * 1.2).toFixed(2)}`,
-      discountPrice: `$${product.price.toFixed(2)}`,
-      gender: Math.random() > 0.5 ? 'men' : 'women',
-      category: ['Tshirts', 'Shirts', 'Jeans', 'Casual Shoes', 'Trousers', 'Sweatshirts', 'Jackets', 'Shorts'][Math.floor(Math.random() * 8)],
-      brand: ['Friskers', 'WOOSTRO', 'FBAR', 'DISPENSER', 'Pepe jeans', 'Masch Sports'][Math.floor(Math.random() * 6)],
-      color: ['Black', 'White', 'Blue', 'Navy Blue', 'Red', 'Grey', 'Maroon', 'Brown'][Math.floor(Math.random() * 8)]
-    }));
+  async (gender = null) => {
+    try {
+      const url = gender 
+        ? `/api/products?gender=${gender}`
+        : '/api/products';
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch products');
+      }
+      
+      return data.products;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
+    }
   }
 );
 
@@ -31,77 +38,63 @@ const productsSlice = createSlice({
   reducers: {
     searchProducts: (state, action) => {
       const searchTerm = action.payload.toLowerCase().trim();
-      if (!searchTerm) {
-        state.filteredItems = state.items;
-      } else {
-        state.filteredItems = state.items.filter(product => 
-          product.name.toLowerCase().includes(searchTerm) ||
-          product.category.toLowerCase().includes(searchTerm) ||
-          product.brand.toLowerCase().includes(searchTerm) ||
-          product.color.toLowerCase().includes(searchTerm) ||
-          product.gender.toLowerCase().includes(searchTerm)
-        );
-      }
+      state.filteredItems = searchTerm 
+        ? state.items.filter(product => 
+            product.title.toLowerCase().includes(searchTerm) ||
+            product.category.toLowerCase().includes(searchTerm) ||
+            product.brand.toLowerCase().includes(searchTerm) ||
+            product.color.toLowerCase().includes(searchTerm) ||
+            product.gender.toLowerCase().includes(searchTerm)
+          )
+        : state.items;
     },
-    filterProducts: (state, action) => {
-      const params = action.payload;
-      let filtered = [...state.items];
-      
-      // Gender filter - handle multiple selections
-      if (params.gender && params.gender.length > 0) {
-        filtered = filtered.filter(p => 
-          params.gender.some(g => p.gender.toLowerCase() === g.toLowerCase())
-        );
-      }
-      
-      // Category filter - handle multiple selections
-      if (params.category && params.category.length > 0) {
-        filtered = filtered.filter(p => 
-          params.category.some(c => 
-            p.category.toLowerCase() === c.toLowerCase()
-          )
-        );
-      }
-      
-      // Brand filter - handle multiple selections
-      if (params.brand && params.brand.length > 0) {
-        filtered = filtered.filter(p => 
-          params.brand.some(b => 
-            p.brand.toLowerCase() === b.toLowerCase()
-          )
-        );
-      }
-      
-      // Color filter - handle multiple selections
-      if (params.color && params.color.length > 0) {
-        filtered = filtered.filter(p => 
-          params.color.some(col => 
-            p.color.toLowerCase() === col.toLowerCase()
-          )
-        );
-      }
-      
-      // Sorting
-      if (params.sort === 'low-high') {
-        filtered.sort((a, b) => 
-          parseFloat(a.discountPrice.replace("$", "")) - 
-          parseFloat(b.discountPrice.replace("$", ""))
-        );
-      } else if (params.sort === 'high-low') {
-        filtered.sort((a, b) => 
-          parseFloat(b.discountPrice.replace("$", "")) - 
-          parseFloat(a.discountPrice.replace("$", ""))
-        );
-      }
-      
-      state.filteredItems = filtered;
-      state.status = 'succeeded';
-    }
+  // In productsSlice.js
+filterProducts: (state, action) => {
+  const { gender, category, brand, color, sort } = action.payload;
+  let filtered = [...state.items];
+  
+  if (gender?.length) {
+    const genderLower = gender.map(g => g.toLowerCase());
+    filtered = filtered.filter(p => 
+      genderLower.includes(p.gender.toLowerCase())
+    );
+  }
+  
+  if (category?.length) {
+    const categoryLower = category.map(c => c.toLowerCase());
+    filtered = filtered.filter(p => 
+      categoryLower.includes(p.category.toLowerCase())
+    );
+  }
+  
+  if (brand?.length) {
+    const brandLower = brand.map(b => b.toLowerCase());
+    filtered = filtered.filter(p => 
+      brandLower.includes(p.brand.toLowerCase())
+    );
+  }
+  
+  if (color?.length) {
+    const colorLower = color.map(c => c.toLowerCase());
+    filtered = filtered.filter(p => 
+      colorLower.includes(p.color.toLowerCase())
+    );
+  }
+  
+  if (sort === 'low-high') {
+    filtered.sort((a, b) => a.discountPrice - b.discountPrice);
+  } else if (sort === 'high-low') {
+    filtered.sort((a, b) => b.discountPrice - a.discountPrice);
+  }
+  
+  state.filteredItems = filtered;
+}
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchProducts.pending, (state) => {
         state.status = 'loading';
+        state.error = null;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.status = 'succeeded';

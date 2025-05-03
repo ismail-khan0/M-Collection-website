@@ -1,24 +1,42 @@
-// src/app/kids/page.jsx
-
+"use client";
+import { useEffect, useState } from "react";
 import AdBanner from "@/Components/AdBanner";
 import FavoriteBrands from "@/Components/FavoriteBrands";
 import IconicBrands from "@/Components/IconicBrands";
 import KidsCategories from "@/Components/KidsCategories";
 import ExploreMore from "@/Components/ExploreMore";
 
+export default function KidsClientPage() {
+  const [products, setProducts] = useState([]);
 
-export default async function KidsPage() {
-  const res = await fetch("https://fakestoreapi.com/products?limit=10", { cache: 'no-store' });
-  const products = await res.json();
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`/api/products?gender=kids`);
+        const data = await response.json();
+
+        if (data.success && Array.isArray(data.products)) {
+          setProducts(data.products);
+        } else {
+          console.error("Unexpected product response format.");
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error("Error fetching product data:", error);
+        setProducts([]);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto p-4 mt-16 bg-white">
       <AdBanner />
-      <FavoriteBrands products={products} /> 
-      <IconicBrands products={products} />   
+      <FavoriteBrands products={products} />
+      <IconicBrands products={products} />
       <KidsCategories products={products} />
-      <ExploreMore products={products} />    
-        
+      <ExploreMore products={products} />
     </div>
   );
 }

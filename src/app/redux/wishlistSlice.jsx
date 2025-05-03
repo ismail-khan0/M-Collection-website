@@ -7,15 +7,19 @@ const wishlistSlice = createSlice({
   },
   reducers: {
     toggleWishlistItem: (state, action) => {
-      const index = state.items.findIndex(item => item.id === action.payload.id);
+      const product = action.payload;
+      // Use _id if available, otherwise fall back to id
+      const productId = product._id || product.id;
+      const index = state.items.findIndex(item => (item._id || item.id) === productId);
+      
       if (index >= 0) {
         state.items.splice(index, 1);  // Remove if already exists
       } else {
-        state.items.push(action.payload);  // Add if doesn't exist
+        state.items.push(product);  // Add if doesn't exist
       }
     },
   },
 });
 
 export const { toggleWishlistItem } = wishlistSlice.actions;
-export default wishlistSlice.reducer
+export default wishlistSlice.reducer;

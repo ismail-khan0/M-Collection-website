@@ -1,5 +1,4 @@
 'use client';
-
 import ProductCard from './ProductCard';
 
 const ProductGrid = ({ products }) => {
@@ -14,8 +13,11 @@ const ProductGrid = ({ products }) => {
   return (
     <div className="w-full md:w-3/4">
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 p-4">
-        {products.map(product => (
-          <ProductCard key={product.id} product={product} />
+        {products.map((product) => (
+          <ProductCard 
+            key={product._id || product.id} // Use _id first if available
+            product={product} 
+          />
         ))}
       </div>
     </div>

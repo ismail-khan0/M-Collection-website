@@ -1,4 +1,3 @@
-'use client';
 import React from "react";
 import { useRouter } from 'next/navigation';
 
@@ -19,7 +18,7 @@ export default function KidsCategories({ products }) {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 mx-8 gap-6">
         {products.map((product) => (
           <div
-            key={product.id}
+            key={product._id || product.id} // Ensure unique identifier is used
             onClick={() => redirectToFilter(product.category)}
             className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center text-center hover:shadow-lg transition h-full cursor-pointer"
           >
