@@ -33,6 +33,10 @@ export default function ProductForm({
     showInCarousel: false,
     showInBrowseCategories: false,
     showInShopByCategory: false,
+    showInKidsCategories: false,
+    showInIconicBrands: false,
+    showInFavouriteBrands: false,
+    showInExploreMore: false,
   },
   onSubmit,
   isEditing = false
@@ -63,7 +67,34 @@ export default function ProductForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await onSubmit(formData);
+    
+    // Create a new FormData object
+    const formDataToSend = new FormData();
+    
+    // Append all regular fields
+    formDataToSend.append('title', formData.title);
+    formDataToSend.append('price', formData.price);
+    formDataToSend.append('discountPrice', formData.discountPrice);
+    formDataToSend.append('gender', formData.gender);
+    formDataToSend.append('category', formData.category);
+    formDataToSend.append('brand', formData.brand);
+    formDataToSend.append('color', formData.color);
+    
+    // Append all display settings as strings
+    formDataToSend.append('showInCarousel', String(formData.showInCarousel));
+    formDataToSend.append('showInBrowseCategories', String(formData.showInBrowseCategories));
+    formDataToSend.append('showInShopByCategory', String(formData.showInShopByCategory));
+    formDataToSend.append('showInKidsCategories', String(formData.showInKidsCategories));
+    formDataToSend.append('showInIconicBrands', String(formData.showInIconicBrands));
+    formDataToSend.append('showInFavouriteBrands', String(formData.showInFavouriteBrands));
+    formDataToSend.append('showInExploreMore', String(formData.showInExploreMore));
+    
+    // Append the image if it exists
+    if (formData.image) {
+      formDataToSend.append('image', formData.image);
+    }
+    
+    await onSubmit(formDataToSend);
   };
 
   return (
@@ -145,7 +176,7 @@ export default function ProductForm({
           <option value="men">Men</option>
           <option value="women">Women</option>
           <option value="kids">Kids</option>
-          <option value="unisex">Unisex</option>
+          <option value="gifts">Gifts</option>
         </select>
       </div>
 
@@ -242,6 +273,47 @@ export default function ProductForm({
               className="mr-2"
             />
             <label>Show in Shop by Category</label>
+          </div>
+          
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              name="showInFavouriteBrands"
+              checked={formData.showInFavouriteBrands}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            <label>Show in FAVOURITE BRANDS</label>
+          </div>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              name="showInIconicBrands"
+              checked={formData.showInIconicBrands}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            <label>Show in Iconic Brands</label>
+          </div>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              name="showInKidsCategories"
+              checked={formData.showInKidsCategories}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            <label>Show in Kids Categories</label>
+          </div>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              name="showInExploreMore"
+              checked={formData.showInExploreMore}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            <label>Show in Explore More</label>
           </div>
         </div>
       </div>

@@ -1,9 +1,31 @@
 'use client';
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 
-export default function ExploreMore({ products }) {
+export default function ExploreMore() {
   const router = useRouter();
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`/api/products?gender=kids&showInExploreMore=true`);
+        const data = await response.json();
+
+        if (data.success && Array.isArray(data.products)) {
+          setProducts(data.products);
+        } else {
+          console.error("Unexpected product response format.");
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error("Error fetching product data:", error);
+        setProducts([]);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const redirectToFilter = (category) => {
     const params = new URLSearchParams();

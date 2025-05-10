@@ -1,42 +1,61 @@
-// app/admin/page.jsx
 "use client";
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import ProductForm from '../../Components/admin/ProductForm';
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import ProductForm from "../../Components/admin/ProductForm";
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState('add');
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState("add");
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [orderStatusFilter, setOrderStatusFilter] = useState("all");
   const [filters, setFilters] = useState({
-    gender: '',
-    category: '',
-    displaySetting: ''
+    gender: "",
+    category: "",
+    displaySetting: "",
   });
-  const router = useRouter();
 
   useEffect(() => {
-    if (activeTab === 'manage') {
-      fetchProducts();
+    if (status === "unauthenticated") {
+      router.push("/admin/signin");
+    } else if (status === "authenticated" && !session?.user?.isAdmin) {
+      router.push("/");
     }
-  }, [activeTab, filters]);
+  }, [status, session, router]);
+
+  useEffect(() => {
+    if (activeTab === "manage") {
+      fetchProducts();
+    } else if (activeTab === "orders") {
+      fetchOrders();
+    }
+  }, [activeTab, filters, orderStatusFilter]);
 
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      let url = '/api/products?';
+      let url = "/api/products?";
       if (filters.gender) url += `gender=${filters.gender}&`;
       if (filters.category) url += `category=${filters.category}&`;
-      
+
       // Add display setting filters
-      if (filters.displaySetting === 'carousel') {
-        url += 'showInCarousel=true&';
-      } else if (filters.displaySetting === 'browse') {
-        url += 'showInBrowseCategories=true&';
-      } else if (filters.displaySetting === 'shop') {
-        url += 'showInShopByCategory=true&';
-      }
+      const mapping = {
+        carousel: "showInCarousel",
+        browse: "showInBrowseCategories",
+        shop: "showInShopByCategory",
+        kids: "showInKidsCategories",
+        iconic: "showInIconicBrands",
+        favourite: "showInFavouriteBrands",
+        explore: "showInExploreMore",
+      };
+
+      const displayKey = mapping[filters.displaySetting];
+      if (displayKey) url += `${displayKey}=true&`;
 
       const response = await fetch(url);
       const data = await response.json();
@@ -44,7 +63,77 @@ export default function AdminPage() {
         setProducts(data.products);
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // In your AdminPage component
+  // In your AdminPage component
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    try {
+      const url = `/api/admin/orders${
+        orderStatusFilter !== "all" ? `?status=${orderStatusFilter}` : ""
+      }`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.success) {
+        setOrders(data.orders);
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    if (!orderId || !newStatus) {
+      alert("Both order ID and status are required");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/admin/orders?id=${orderId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: newStatus,
+          ...(newStatus === "cancelled" && {
+            paymentStatus: "refunded",
+          }),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to update order");
+      }
+
+      // Update local state
+      setOrders((prev) =>
+        prev.map((order) =>
+          order._id === orderId
+            ? {
+                ...order,
+                status: newStatus,
+                payment: {
+                  ...order.payment,
+                  ...(newStatus === "cancelled" && { status: "refunded" }),
+                },
+              }
+            : order
+        )
+      );
+
+      alert("Order status updated successfully!");
+    } catch (error) {
+      console.error("Error updating order:", error);
+      alert(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -52,148 +141,185 @@ export default function AdminPage() {
 
   const handleAddProduct = async (formData) => {
     try {
-      const formDataToSend = new FormData();
-      
-      // Append all fields
-      Object.keys(formData).forEach(key => {
-        if (key !== 'image' || formData.image) {
-          formDataToSend.append(key, formData[key]);
-        }
-      });
-
-      const response = await fetch('/api/products', {
-        method: 'POST',
-        body: formDataToSend,
+      const response = await fetch("/api/products", {
+        method: "POST",
+        body: formData,
       });
 
       const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to add product');
-      }
+      if (!response.ok)
+        throw new Error(result.error || "Failed to add product");
 
-      alert('Product added successfully!');
-      setActiveTab('manage');
+      alert("Product added successfully!");
+      setActiveTab("manage");
     } catch (error) {
-      console.error('Submission error:', error);
+      console.error("Submission error:", error);
       alert(`Error: ${error.message}\nCheck console for details`);
     }
   };
 
   const handleUpdateProduct = async (formData) => {
     try {
-      const formDataToSend = new FormData();
-      
-      // Append all fields
-      Object.keys(formData).forEach(key => {
-        if (key !== 'image' || formData.image) {
-          formDataToSend.append(key, formData[key]);
-        }
-      });
-
       const response = await fetch(`/api/products?id=${editingProduct._id}`, {
-        method: 'PUT',
-        body: formDataToSend,
+        method: "PUT",
+        body: formData,
       });
 
       const result = await response.json();
-      
+
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to update product');
+        throw new Error(result.error || "Failed to update product");
       }
 
-      alert('Product updated successfully!');
+      alert("Product updated successfully!");
       setEditingProduct(null);
-      setActiveTab('manage');
+      setActiveTab("manage");
       fetchProducts();
     } catch (error) {
-      console.error('Update error:', error);
+      console.error("Update error:", error);
       alert(`Error: ${error.message}\nCheck console for details`);
     }
   };
 
   const handleDeleteProduct = async (productId) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
-    
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
     try {
       const response = await fetch(`/api/products?id=${productId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       const result = await response.json();
-      
+
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to delete product');
+        throw new Error(result.error || "Failed to delete product");
       }
 
-      alert('Product deleted successfully!');
+      alert("Product deleted successfully!");
       fetchProducts();
     } catch (error) {
-      console.error('Delete error:', error);
+      console.error("Delete error:", error);
       alert(`Error: ${error.message}\nCheck console for details`);
     }
   };
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
-    setActiveTab('edit');
+    setActiveTab("edit");
   };
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this order? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/admin/orders?id=${orderId}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to delete order");
+      }
+
+      // Remove the deleted order from local state
+      setOrders((prevOrders) =>
+        prevOrders.filter((order) => order._id !== orderId)
+      );
+
+      alert("Order deleted successfully!");
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert(`Error: ${error.message}\nCheck console for details`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
-      
+
       {/* Tabs */}
       <div className="flex border-b mb-6">
         <button
-          className={`py-2 px-4 font-medium ${activeTab === 'add' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'}`}
+          className={`py-2 px-4 font-medium ${
+            activeTab === "add"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-600"
+          }`}
           onClick={() => {
             setEditingProduct(null);
-            setActiveTab('add');
+            setActiveTab("add");
           }}
         >
           Add Product
         </button>
         <button
-          className={`py-2 px-4 font-medium ${activeTab === 'manage' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'}`}
-          onClick={() => setActiveTab('manage')}
+          className={`py-2 px-4 font-medium ${
+            activeTab === "manage"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-600"
+          }`}
+          onClick={() => setActiveTab("manage")}
         >
           Manage Products
         </button>
         {editingProduct && (
           <button
-            className={`py-2 px-4 font-medium ${activeTab === 'edit' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'}`}
-            onClick={() => setActiveTab('edit')}
+            className={`py-2 px-4 font-medium ${
+              activeTab === "edit"
+                ? "border-b-2 border-blue-500 text-blue-600"
+                : "text-gray-600"
+            }`}
+            onClick={() => setActiveTab("edit")}
           >
             Edit Product
           </button>
         )}
+        <button
+          className={`py-2 px-4 font-medium ${
+            activeTab === "orders"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-600"
+          }`}
+          onClick={() => setActiveTab("orders")}
+        >
+          Orders
+        </button>
       </div>
 
       {/* Tab Content */}
       <div>
-        {activeTab === 'add' && (
+        {activeTab === "add" && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
             <ProductForm onSubmit={handleAddProduct} />
           </div>
         )}
 
-        {activeTab === 'edit' && editingProduct && (
+        {activeTab === "edit" && editingProduct && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
-            <ProductForm 
+            <ProductForm
               initialData={{
                 ...editingProduct,
-                image: editingProduct.image // This will be the existing image path
+                image: editingProduct.image,
               }}
               onSubmit={handleUpdateProduct}
               isEditing={true}
@@ -201,10 +327,10 @@ export default function AdminPage() {
           </div>
         )}
 
-        {activeTab === 'manage' && (
+        {activeTab === "manage" && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Manage Products</h2>
-            
+
             {/* Filter Controls */}
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
               <h3 className="text-lg font-medium mb-3">Filters</h3>
@@ -221,7 +347,7 @@ export default function AdminPage() {
                     <option value="men">Men</option>
                     <option value="women">Women</option>
                     <option value="kids">Kids</option>
-                    <option value="unisex">Unisex</option>
+                    <option value="gifts">Gifts</option>
                   </select>
                 </div>
                 <div>
@@ -259,6 +385,10 @@ export default function AdminPage() {
                     <option value="carousel">In Carousel</option>
                     <option value="browse">In Browse Categories</option>
                     <option value="shop">In Shop by Category</option>
+                    <option value="kids">In Kids Categories</option>
+                    <option value="iconic">In Iconic Brands</option>
+                    <option value="favourite">In Favourite Brands</option>
+                    <option value="explore">In Explore More</option>
                   </select>
                 </div>
               </div>
@@ -287,30 +417,68 @@ export default function AdminPage() {
                       products.map((product) => (
                         <tr key={product._id} className="hover:bg-gray-50">
                           <td className="py-2 px-4 border">
-                            <img 
-                              src={product.image} 
-                              alt={product.title} 
+                            <img
+                              src={product.image}
+                              alt={product.title}
                               className="h-16 object-contain"
                             />
                           </td>
                           <td className="py-2 px-4 border">{product.title}</td>
                           <td className="py-2 px-4 border">${product.price}</td>
-                          <td className="py-2 px-4 border">{product.category}</td>
-                          <td className="py-2 px-4 border capitalize">{product.gender}</td>
                           <td className="py-2 px-4 border">
-                            <div className="flex flex-col space-y-1 text-sm">
+                            {product.category}
+                          </td>
+                          <td className="py-2 px-4 border capitalize">
+                            {product.gender}
+                          </td>
+                          <td className="py-2 px-4 border">
+                            <div className="flex flex-wrap gap-1">
                               {product.showInCarousel && (
-                                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">Carousel</span>
+                                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                                  Carousel
+                                </span>
                               )}
                               {product.showInBrowseCategories && (
-                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded">Browse</span>
+                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                                  Browse
+                                </span>
                               )}
                               {product.showInShopByCategory && (
-                                <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded">Shop</span>
+                                <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">
+                                  Shop
+                                </span>
                               )}
-                              {!product.showInCarousel && !product.showInBrowseCategories && !product.showInShopByCategory && (
-                                <span className="text-gray-500">None</span>
+                              {product.showInKidsCategories && (
+                                <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">
+                                  Kids
+                                </span>
                               )}
+                              {product.showInIconicBrands && (
+                                <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">
+                                  Iconic
+                                </span>
+                              )}
+                              {product.showInFavouriteBrands && (
+                                <span className="bg-pink-100 text-pink-800 px-2 py-1 rounded text-xs">
+                                  Favourite
+                                </span>
+                              )}
+                              {product.showInExploreMore && (
+                                <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-xs">
+                                  Explore
+                                </span>
+                              )}
+                              {!product.showInCarousel &&
+                                !product.showInBrowseCategories &&
+                                !product.showInShopByCategory &&
+                                !product.showInKidsCategories &&
+                                !product.showInIconicBrands &&
+                                !product.showInFavouriteBrands &&
+                                !product.showInExploreMore && (
+                                  <span className="text-gray-500 text-xs">
+                                    None
+                                  </span>
+                                )}
                             </div>
                           </td>
                           <td className="py-2 px-4 border">
@@ -333,13 +501,172 @@ export default function AdminPage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="7" className="py-4 text-center text-gray-500">
+                        <td
+                          colSpan="7"
+                          className="py-4 text-center text-gray-500"
+                        >
                           No products found
                         </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "orders" && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Manage Orders</h2>
+            <div className="mb-4">
+              <label className="mr-2">Filter by status:</label>
+              <select
+                value={orderStatusFilter}
+                onChange={(e) => {
+                  setOrderStatusFilter(e.target.value);
+                  fetchOrders();
+                }}
+                className="p-2 border rounded"
+              >
+                <option value="all">All Orders</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            {isLoading ? (
+              <div className="flex justify-center items-center h-40">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {orders.length > 0 ? (
+                  orders.map((order) => (
+                    <div key={order._id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-medium">
+                            Order #{order.orderNumber}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {new Date(order.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span
+                          className={`px-2 py-1 rounded text-xs capitalize ${
+                            order.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : order.status === "processing"
+                              ? "bg-blue-100 text-blue-800"
+                              : order.status === "shipped"
+                              ? "bg-purple-100 text-purple-800"
+                              : order.status === "delivered"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {order.status}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="bg-gray-50 p-3 rounded">
+                          <h4 className="font-medium mb-2">Shipping Address</h4>
+                          <p>{order.shippingAddress.fullName}</p>
+                          <p>{order.shippingAddress.street}</p>
+                          <p>
+                            {order.shippingAddress.city},{" "}
+                            {order.shippingAddress.state}{" "}
+                            {order.shippingAddress.zipCode}
+                          </p>
+                          <p>{order.shippingAddress.country}</p>
+                          <p className="mt-1">
+                            Phone: {order.shippingAddress.phone}
+                          </p>
+                        </div>
+
+                        <div className="bg-gray-50 p-3 rounded">
+                          <h4 className="font-medium mb-2">Payment</h4>
+                          <p className="capitalize">{order.paymentMethod}</p>
+                          <div className="mt-2">
+                            <p>Subtotal: Rs.{order.subtotal.toFixed(2)}</p>
+                            <p>
+                              Discount: -Rs.{order.totalDiscount.toFixed(2)}
+                            </p>
+                            <p className="font-medium">
+                              Total: Rs.{order.totalPrice.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="bg-gray-50 p-3 rounded">
+                          <h4 className="font-medium mb-2">
+                            Items ({order.items.length})
+                          </h4>
+                          <div className="space-y-2">
+                            {order.items.map((item, index) => (
+                              <div key={index} className="flex items-center">
+                                <img
+                                  src={item.image}
+                                  alt={item.title}
+                                  className="w-12 h-12 object-contain mr-2"
+                                />
+                                <div>
+                                  <p className="text-sm line-clamp-1">
+                                    {item.title}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    Rs.{item.discountPrice || item.price} x{" "}
+                                    {item.quantity}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <select
+                          value={order.status}
+                          onChange={(e) =>
+                            handleUpdateOrderStatus(order._id, e.target.value)
+                          }
+                          className="p-2 border rounded text-sm"
+                          disabled={isLoading}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="processing">Processing</option>
+                          <option value="shipped">Shipped</option>
+                          <option value="delivered">Delivered</option>
+                          <option value="cancelled">Cancelled</option>
+                        </select>
+                        <button
+                          onClick={() => handleDeleteOrder(order._id)}
+                          className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 text-sm"
+                          disabled={isLoading}
+                        >
+                          Delete
+                        </button>
+
+                        <button
+                          onClick={() => {}}
+                          className="text-blue-600 hover:underline text-sm"
+                        >
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 py-4">
+                    No orders found
+                  </p>
+                )}
               </div>
             )}
           </div>

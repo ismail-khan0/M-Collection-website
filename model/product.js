@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
   title: {
@@ -21,7 +21,7 @@ const productSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ["men", "women", "kids", "unisex"],
+    enum: ["men", "women", "kids", "gifts"],
     required: [true, "Gender is required"],
     lowercase: true,
   },
@@ -41,7 +41,6 @@ const productSchema = new mongoose.Schema({
     trim: true,
     lowercase: true,
   },
-  // Display settings
   showInCarousel: {
     type: Boolean,
     default: false,
@@ -54,30 +53,21 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  // Kids section specific settings
-  showInKidsFavoriteBrands: {
-    type: Boolean,
-    default: false,
-  },
-  showInKidsIconicBrands: {
-    type: Boolean,
-    default: false,
-  },
   showInKidsCategories: {
     type: Boolean,
     default: false,
   },
-  showInKidsExploreMore: {
+  showInIconicBrands: {
     type: Boolean,
     default: false,
   },
-  featuredInKidsSection: {
+  showInFavouriteBrands: {
     type: Boolean,
     default: false,
   },
-  kidsSectionOrder: {
-    type: Number,
-    default: 0,
+  showInExploreMore: {
+    type: Boolean,
+    default: false,
   },
   createdAt: {
     type: Date,
@@ -85,5 +75,4 @@ const productSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.models.Product ||
-  mongoose.model("Product", productSchema);
+export default mongoose.models.Product || mongoose.model('Product', productSchema);

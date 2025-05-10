@@ -21,26 +21,22 @@ const CategoryGrid = ({ start = 0, end = '', gender = 'men', sectionTitle = 'Bro
 
         const response = await fetch(url);
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const data = await response.json();
 
-        // Process to get unique categories with proper validation
         const uniqueCategories = [];
         const categorySet = new Set();
 
         if (Array.isArray(data?.products)) {
           data.products.forEach((product) => {
-            // Ensure product has a category before processing
             if (product?.category && typeof product.category === 'string') {
-              const normalizedCategory = product.category.trim();
-              if (normalizedCategory && !categorySet.has(normalizedCategory)) {
-                categorySet.add(normalizedCategory);
+              const normalized = product.category.trim();
+              if (normalized && !categorySet.has(normalized)) {
+                categorySet.add(normalized);
                 uniqueCategories.push({
-                  _id: product._id || Math.random().toString(36).substring(2, 9),
-                  title: normalizedCategory,
+                  _id: product._id || Math.random().toString(36).substr(2, 9),
+                  title: normalized,
                   image: product.image || '/default-product-image.png',
                 });
               }
@@ -49,7 +45,7 @@ const CategoryGrid = ({ start = 0, end = '', gender = 'men', sectionTitle = 'Bro
 
           setCategories(uniqueCategories);
         } else {
-          console.warn('Unexpected API response structure:', data);
+          console.warn('Unexpected API structure:', data);
           setCategories([]);
         }
       } catch (error) {
@@ -64,23 +60,12 @@ const CategoryGrid = ({ start = 0, end = '', gender = 'men', sectionTitle = 'Bro
     fetchCategories();
   }, [gender]);
 
- // In Carousel, CategoryGrid, and ShopByCategory components
-const redirectToFilter = (productOrCategory) => {
-  const params = new URLSearchParams();
-  
-  // Handle both cases where we might get a product object or just a category string
-  const category = typeof productOrCategory === 'string' 
-    ? productOrCategory 
-    : productOrCategory?.category || '';
-  
-  // Always set the gender prop that was passed to the component
-  if (gender) params.set('gender', gender.toLowerCase());
-  
-  // Set category if available
-  if (category) params.set('category', category.trim().toLowerCase());
-  
-  router.push(`/products?${params.toString()}`);
-};
+  const redirectToFilter = (categoryTitle) => {
+    const params = new URLSearchParams();
+    if (gender) params.set('gender', gender.toLowerCase());
+    if (categoryTitle) params.set('category', categoryTitle.trim().toLowerCase());
+    router.push(`/products?${params.toString()}`);
+  };
 
   if (isLoading) {
     return (
@@ -150,8 +135,8 @@ const redirectToFilter = (productOrCategory) => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-10">
-          <p>No categories found</p>
+        <div className="text-center text-gray-500 text-lg font-medium py-10">
+          No categories found.
         </div>
       )}
     </div>

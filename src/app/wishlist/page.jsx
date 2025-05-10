@@ -1,5 +1,5 @@
 'use client';
-import Wishlist from '@/Components/Wishlist';
+import Wishlist from '@/Components/wishlist/Wishlist';
 
 const WishlistPage = () => {
   return (

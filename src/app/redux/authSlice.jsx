@@ -1,10 +1,10 @@
 'use client';
 import { createSlice } from '@reduxjs/toolkit';
 
-// Initial state without accessing localStorage directly
 const initialState = {
   user: null,
   isAuthenticated: false,
+  isAdmin: false,
   loading: false,
   error: null,
 };
@@ -20,9 +20,9 @@ const authSlice = createSlice({
     loginSuccess: (state, action) => {
       state.user = action.payload;
       state.isAuthenticated = true;
+      state.isAdmin = action.payload?.isAdmin || false;
       state.loading = false;
       state.error = null;
-      // Safe to access localStorage in reducers because they're dispatched client-side
       if (typeof window !== 'undefined') {
         localStorage.setItem('currentUser', JSON.stringify(action.payload));
       }
@@ -38,6 +38,7 @@ const authSlice = createSlice({
     signupSuccess: (state, action) => {
       state.user = action.payload;
       state.isAuthenticated = true;
+      state.isAdmin = action.payload?.isAdmin || false;
       state.loading = false;
       state.error = null;
       if (typeof window !== 'undefined') {
@@ -51,6 +52,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
+      state.isAdmin = false;
       state.loading = false;
       state.error = null;
       if (typeof window !== 'undefined') {
