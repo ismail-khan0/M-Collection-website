@@ -90,7 +90,7 @@ const ShopByCategory = ({ title = "Shop by Category", gender = "men" }) => {
                 <div className="bg-red-500 text-white flex flex-col justify-center items-center p-2 gap-1">
                   <p className="text-sm font-semibold">{product.category || 'Category'}</p>
                   <p className="text-lg font-extrabold">
-                    {product.discountPrice || 0} % OFF
+                  10-15 % OFF
                   </p>
                   <p className="text-sm font-semibold">Shop Now</p>
                 </div>

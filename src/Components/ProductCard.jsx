@@ -28,7 +28,6 @@ const ProductCard = ({ product }) => {
       className="group bg-white h-full flex flex-col justify-between p-4 rounded-xl shadow-md hover:shadow-lg transition duration-300"
       title={product.name}
     >
-      {/* Image - Full area cover */}
       <div className="relative aspect-square overflow-hidden rounded-lg mb-4 w-full">
        
         <Image

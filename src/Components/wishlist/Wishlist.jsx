@@ -7,7 +7,6 @@ import WishlistItems from './WishlistItems';
 import WishlistSummary from './WishlistSummary';
 import CheckoutProcess from '../Checkout/CheckoutProcess';
 import { useSession } from 'next-auth/react';
-
 const Wishlist = () => {
   const [checkoutStep, setCheckoutStep] = useState(0);
   const { data: session } = useSession();
@@ -82,7 +81,50 @@ const Wishlist = () => {
       <WishlistItems onToggleWishlist={handleToggleWishlist} />
       <WishlistSummary onCheckout={() => setCheckoutStep(1)} />
     </div>
+    
   );
+  // Add this to your order details page
+
+
+function OrderDetailsPage({ order }) {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleStartChat = async () => {
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: session.user.id,
+          orderId: order._id,
+          message: `I have a question about order #${order.orderNumber}`
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        router.push("/account/support");
+      }
+    } catch (error) {
+      console.error("Error starting chat:", error);
+    }
+  };
+
+  return (
+    <div>
+      {/* Your existing order details */}
+      <button
+        onClick={handleStartChat}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Contact Support About This Order
+      </button>
+    </div>
+  );
+}
 };
 
 export default Wishlist;
