@@ -1,7 +1,7 @@
-'use client';
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+"use client";
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
 
 const Footer = () => {
   return (
@@ -13,13 +13,21 @@ const Footer = () => {
             ONLINE SHOPPING
           </h2>
           <ul className="space-y-1 text-gray-600">
-            <li>Men</li>
-            <li>Women</li>
-            <li>Kids</li>
-            <li>Home & Living</li>
-            <li>Beauty</li>
-            <li>Gift Cards</li>
-            <li>Myntra Insider</li>
+            {[
+              { label: "Men", href: "/men" },
+              { label: "Women", href: "/women" },
+              { label: "Kids", href: "/kids" },
+              { label: "Home & Living", href: "/home-living" },
+              { label: "Beauty", href: "/beauty" },
+              { label: "Gift Cards", href: "/gift-cards" },
+              { label: "Myntra Insider", href: "/insider" },
+            ].map((link) => (
+              <li key={link.label}>
+                <Link href={link.href} className="hover:underline">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
           <h2 className="font-bold mt-4 mb-2">USEFUL LINKS</h2>
           <ul className="space-y-1 text-gray-600">
@@ -73,17 +81,17 @@ const Footer = () => {
         <div>
           <h2 className="font-bold mb-2">EXPERIENCE MYNTRA APP ON MOBILE</h2>
           <div className="flex space-x-2">
-            <Image 
-              src="/Image/kid.webp" 
-              width={128} 
-              height={40} 
+            <Image
+              src="/Image/kid.webp"
+              width={128}
+              height={40}
               alt="Google Play"
               className="w-32"
             />
-            <Image 
-              src="/Image/kid.webp" 
-              width={128} 
-              height={40} 
+            <Image
+              src="/Image/kid.webp"
+              width={128}
+              height={40}
               alt="App Store"
               className="w-32"
             />
@@ -102,13 +110,15 @@ const Footer = () => {
           <div className="flex items-center space-x-2">
             <i className="fa-solid fa-people-robbery w-8 text-3xl"></i>
             <p>
-              <span className="font-bold">100% ORIGINAL</span> guarantee for all products at mailocollection.com
+              <span className="font-bold">100% ORIGINAL</span> guarantee for all
+              products at mailocollection.com
             </p>
           </div>
           <div className="flex items-center space-x-2 mt-4">
             <i className="fa-solid fa-retweet text-3xl"></i>
             <p>
-              <span className="font-bold">Return within 14 days</span> of receiving your order
+              <span className="font-bold">Return within 14 days</span> of
+              receiving your order
             </p>
           </div>
         </div>
@@ -122,19 +132,27 @@ const Footer = () => {
             <div className="w-auto h-[1px] mx-2 bg-gray-300 flex-1"></div>
           </div>
           <p className="text-sm text-gray-600">
-            Makeup | Dresses For Girls | T-Shirts | Sandals | Headphones | Babydolls | Blazers For Men |
-            Handbags | Ladies Watches | Bags | Sport Shoes | Reebok Shoes | Puma Shoes | Boxers | Wallets |
-            Tops | Earrings | Fastrack Watches | Kurtis | Nike | Smart Watches | Titan Watches | Designer Blouse |
-            Gowns | Rings | Cricket Shoes | Forever 21 | Eye Makeup | Photo Frames | Punjabi Suits | Bikini |
-            Myntra Fashion Show | Lipstick | Saree | Watches | Dresses | Lehenga | Nike Shoes | Goggles |
-            Bras | Suit | Chinos | Shoes | Adidas Shoes | Woodland Shoes | Jewellery | Designers Sarees
+            Makeup | Dresses For Girls | T-Shirts | Sandals | Headphones |
+            Babydolls | Blazers For Men | Handbags | Ladies Watches | Bags |
+            Sport Shoes | Reebok Shoes | Puma Shoes | Boxers | Wallets | Tops |
+            Earrings | Fastrack Watches | Kurtis | Nike | Smart Watches | Titan
+            Watches | Designer Blouse | Gowns | Rings | Cricket Shoes | Forever
+            21 | Eye Makeup | Photo Frames | Punjabi Suits | Bikini | Myntra
+            Fashion Show | Lipstick | Saree | Watches | Dresses | Lehenga | Nike
+            Shoes | Goggles | Bras | Suit | Chinos | Shoes | Adidas Shoes |
+            Woodland Shoes | Jewellery | Designers Sarees
           </p>
         </div>
         <div className="flex flex-col sm:flex-row justify-between">
           <div className="text-sm text-gray-600 mb-4 sm:mb-0">
-            In case of any concern, <Link href="#" className="text-blue-600 font-semibold">Contact Us</Link>
+            In case of any concern,{" "}
+            <Link href="#" className="text-blue-600 font-semibold">
+              Contact Us
+            </Link>
           </div>
-          <div className="text-sm text-gray-500">&copy; 2025 www.Mailocollection.com. All rights reserved.</div>
+          <div className="text-sm text-gray-500">
+            &copy; 2025 www.Mailocollection.com. All rights reserved.
+          </div>
           <div className="text-sm text-gray-500">A Flipkart company</div>
         </div>
         <div className="mt-6 flex flex-col sm:flex-row justify-between">
@@ -152,7 +170,13 @@ const Footer = () => {
           <div className="flex flex-col justify-end mt-4 sm:mt-0">
             <p className="text-sm text-gray-600">CIN: U72300KA2007PTC041799</p>
             <p className="text-sm text-gray-600">
-              Telephone: <a href="tel:+918061561999" className="text-blue-600 font-semibold">+92-316-8323253</a>
+              Telephone:{" "}
+              <a
+                href="tel:+918061561999"
+                className="text-blue-600 font-semibold"
+              >
+                +92-316-8323253
+              </a>
             </p>
           </div>
         </div>

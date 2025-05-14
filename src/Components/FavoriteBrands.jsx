@@ -1,14 +1,36 @@
 'use client';
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 
-export default function FavoriteBrands({ products }) {
+export default function FavoriteBrands() {
   const router = useRouter();
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`/api/products?gender=kids&showInFavouriteBrands=true`);
+        const data = await response.json();
+
+        if (data.success && Array.isArray(data.products)) {
+          setProducts(data.products);
+        } else {
+          console.error("Unexpected product response format.");
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error("Error fetching product data:", error);
+        setProducts([]);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const redirectToFilter = (brand) => {
     const params = new URLSearchParams();
     params.set('gender', 'kids');
-    params.set('brand', brand); // Add the brand filter
+    params.set('brand', brand);
     router.push(`/products?${params.toString()}`);
   };
 

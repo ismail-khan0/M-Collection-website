@@ -3,26 +3,56 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-const ShopByCategory = ({
-  apiUrl,
-  title = "Shop by Category",
-  gender = "men",
-}) => {
+const ShopByCategory = ({ title = "Shop by Category", gender = "men" }) => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const redirectToFilter = (categoryId) => {
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const url = gender 
+          ? `/api/products?showInShopByCategory=true&gender=${gender}`
+          : '/api/products?showInShopByCategory=true';
+        
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.success && Array.isArray(data.products)) {
+          const categoriesMap = new Map();
+          data.products.forEach((product) => {
+            if (product?.category) {
+              categoriesMap.set(product.category, product);
+            }
+          });
+          setProducts(Array.from(categoriesMap.values()));
+        } else {
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error("Error fetching product data:", error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [gender]);
+
+  const redirectToFilter = (productOrCategory) => {
     const params = new URLSearchParams();
-    params.set("gender", gender); // dynamic
+
+    const category = typeof productOrCategory === 'string' 
+      ? productOrCategory 
+      : productOrCategory?.category || '';
+
+    if (gender) params.set('gender', gender.toLowerCase());
+    if (category) params.set('category', category.trim().toLowerCase());
+
     router.push(`/products?${params.toString()}`);
   };
-
-  useEffect(() => {
-    fetch(apiUrl)
-      .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error("Failed to fetch products:", err));
-  }, [apiUrl]);
 
   return (
     <div id="Shop-Category" className="py-10 bg-gray-100">
@@ -31,36 +61,43 @@ const ShopByCategory = ({
           {title}
         </h1>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-          {products.slice(0, 12).map((product) => (
-            <div
-              key={product.id}
-              onClick={() => redirectToFilter(product.title)}
-              className="bg-white border-4 border-red-500 overflow-hidden shadow hover:scale-105 transition-all cursor-pointer"
-            >
-              <div className="w-full aspect-[3/4] relative bg-white p-8">
-                <Image
-                  src={product.image}
-                  alt={product.title}
-                  fill
-                  className="p-2"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                />
-              </div>
-
-              <div className="w-full h-32 bg-red-600 text-white flex flex-col justify-between p-3 text-center">
-                <div>
-                  <p className="text-sm font-medium">{product.title}</p>
+        {loading ? (
+          <p className="text-center text-gray-500">Loading...</p>
+        ) : products.length === 0 ? (
+          <p className="text-center text-gray-600 text-lg font-medium">No data found.</p>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {products.map((product) => (
+              <div
+                key={product._id || product.id}
+                onClick={() => redirectToFilter(product)}
+                className="bg-white border-8 border-red-500 overflow-hidden shadow-sm cursor-pointer flex flex-col group"
+              >
+                <div className="relative w-full aspect-[3/4] overflow-hidden">
+                  <Image
+                    src={product.image || '/default-product-image.png'}
+                    alt={product.title || 'Product image'}
+                    fill
+                    className="object-contain transition-transform duration-300 ease-in-out group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/default-product-image.png';
+                    }}
+                  />
                 </div>
 
-                <div>
-                  <p className="text-xl font-extrabold">{product.price}</p>
+                <div className="bg-red-500 text-white flex flex-col justify-center items-center p-2 gap-1">
+                  <p className="text-sm font-semibold">{product.category || 'Category'}</p>
+                  <p className="text-lg font-extrabold">
+                  10-15 % OFF
+                  </p>
                   <p className="text-sm font-semibold">Shop Now</p>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

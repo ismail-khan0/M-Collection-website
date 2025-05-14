@@ -9,13 +9,16 @@ const wishlistSlice = createSlice({
     toggleWishlistItem: (state, action) => {
       const index = state.items.findIndex(item => item.id === action.payload.id);
       if (index >= 0) {
-        state.items.splice(index, 1);  // Remove if already exists
+        state.items.splice(index, 1);
       } else {
-        state.items.push(action.payload);  // Add if doesn't exist
+        state.items.push(action.payload);
       }
+    },
+    clearWishlist: (state) => {
+      state.items = [];
     },
   },
 });
 
-export const { toggleWishlistItem } = wishlistSlice.actions;
-export default wishlistSlice.reducer
+export const { toggleWishlistItem, clearWishlist } = wishlistSlice.actions;
+export default wishlistSlice.reducer;

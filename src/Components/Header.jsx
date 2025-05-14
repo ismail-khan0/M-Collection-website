@@ -4,12 +4,15 @@ import { useDispatch } from "react-redux";
 import { searchProducts } from "./../app/redux/productsSlice";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "../../public/Image/Logo.jpeg";
+import logo from "../../public/Image/m-logo.png";
 import ProfileDropdown from "./ProfileDropdown";
 import { CiHeart, CiUser } from "react-icons/ci";
 import { PiBagSimpleLight } from "react-icons/pi";
+import { useSession } from "next-auth/react";
 
 export default function Header() {
+  const { data: session } = useSession();
+  const user = session?.user;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const dispatch = useDispatch();
@@ -191,14 +194,16 @@ export default function Header() {
             </li>
 
             <li className="relative group">
-              <Link
-                href="#"
-                id="Kids"
-                className="block relative px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:py-7 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-              >
-                Studio
-                <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-red-500 group-hover:w-full"></span>
-              </Link>
+    
+              {user?.isAdmin && (
+                <Link
+                  href="/inputData"
+                  className="block relative px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:py-7 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                >
+                  Admin Dashboard
+                  <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-red-500 group-hover:w-full"></span>
+                </Link>
+              )}
             </li>
           </ul>
         </div>

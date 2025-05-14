@@ -42,7 +42,7 @@ export default function ProfileDropdown() {
           </div>
         </>
       ) : (
-        <Link href="/signin">
+        <Link href="/auth-section">
           <button className="w-full py-1 px-4 text-blue-600 border border-blue-600 rounded-sm hover:bg-blue-50">
             Sign In
           </button>
@@ -53,11 +53,11 @@ export default function ProfileDropdown() {
 
 <div>
   <ul className="space-y-1 text-sm">
-    <li><Link href="#">Orders</Link></li>
-    <li><Link href="#">Wishlist</Link></li>
-    <li><Link href="#">Gift Cards</Link></li>
-    <li><Link href="#">Contact Us</Link></li>
-    <li><Link href="#">Myntra Insider</Link></li>
+    <li><Link href="/products">Orders</Link></li>
+    <li><Link href="/wishlist">Wishlist</Link></li>
+    <li><Link href="/gifts">Gift Cards</Link></li>
+    <li><Link href="/support">Contact Us</Link></li>
+
   </ul>
 </div>
 
@@ -65,7 +65,7 @@ export default function ProfileDropdown() {
 
 <div>
   <ul className="space-y-1 text-sm">
-    <li><Link href="#">Myntra Credit</Link></li>
+    <li><Link href="#">M Collection Credit</Link></li>
     <li><Link href="#">Coupons</Link></li>
     <li><Link href="#">Saved Cards</Link></li>
     <li><Link href="#">Saved VPA</Link></li>
