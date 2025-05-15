@@ -52,7 +52,7 @@
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "ts-node-esm": "^0.0.2",
-    "typescript": "^5.0.0"
+    "typescript": "^3.9.3"
   },
   "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
   "main": "index.js",
