@@ -1,40 +1,51 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2020",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "types": [
+      "node",
+      "jest"
+    ],
     "plugins": [
       {
         "name": "next"
       }
-    ],
-    "baseUrl": ".",  // Ensures baseUrl is set to the root directory
-    "paths": {
-      "@/*": ["src/*"]  // Correctly map the @ alias to the src folder
-    }
+    ]
   },
   "include": [
-    "next-env.d.js",
+    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
     ".next/types/**/*.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/Components/**/*.js",  // Ensure .js files under src/Components are included
-    "src/Components/**/*.jsx", // Ensure .jsx files under src/Components are included
-    "src/app/**/*.js",  // Ensure .js files under src/app are included
-    "src/app/**/*.jsx"  // Ensure .jsx files under src/app are included
-, "next.config.js", "next.config.jsx","server.jsx"  ],
+    "next.config.mjs",
+    "next.config.js",
+    "server.js",
+    "server.ts"
+  ],
   "exclude": [
     "node_modules"
   ]
