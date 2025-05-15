@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@eslint/config-array": "^0.20.0",
+    "@eslint/object-schema": "^2.1.6",
     "@faker-js/faker": "^9.6.0",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
@@ -25,7 +27,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
     "embla-carousel-react": "^8.6.0",
-    "eslint": "8.57.0",
+    "eslint": "^9.26.0",
     "eslint-config-next": "14.1.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
