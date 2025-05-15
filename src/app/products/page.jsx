@@ -1,48 +1,65 @@
 "use client";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts, filterProducts } from "@/app/redux/productsSlice";
+import {
+  fetchProducts,
+  filterProducts,
+  searchProducts,
+  clearSearch,
+} from "@/app/redux/productsSlice";
 import {
   setGenderFilter,
   setCategoryFilter,
   setBrandFilter,
   setColorFilter,
   setSort,
-  clearFilters
+  clearFilters,
 } from "@/app/redux/filtersSlice";
 import FilterSidebar from "@/Components/FilterSidebar";
 import ProductGrid from "@/Components/ProductGrid";
 import SortSelect from "@/Components/SortSelect";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-const CategoryPage = () => {
+const ProductsPage = () => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
-  const { items, filteredItems, status } = useSelector(
+  const searchQuery = searchParams.get("search") || "";
+  const { items, filteredItems, status, searchResults } = useSelector(
     (state) => state.products
   );
   const filters = useSelector((state) => state.filters);
   const [categoryName, setCategoryName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isSearchMode, setIsSearchMode] = useState(false);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
   useEffect(() => {
-    if (status === "succeeded") {
-      const params = {};
-      // Get all filter values from URL
-      const gender = searchParams.getAll('gender');
-      const category = searchParams.getAll('category');
-      const brand = searchParams.getAll('brand');
-      const color = searchParams.getAll('color');
-      const sort = searchParams.get('sort') || 'recommended';
+    const searchParam = searchParams.get("search");
+    if (searchParam) {
+      setIsSearchMode(true);
+      dispatch(searchProducts(searchParam));
+      setCategoryName(`Search Results for "${searchParam}"`);
+    } else {
+      setIsSearchMode(false);
+      dispatch(clearSearch());
+    }
+  }, [searchParams, dispatch]);
 
-      // Clear all filters first
+  useEffect(() => {
+    if (!isSearchMode && status === "succeeded") {
+      const params = {};
+      const gender = searchParams.getAll("gender");
+      const category = searchParams.getAll("category");
+      const brand = searchParams.getAll("brand");
+      const color = searchParams.getAll("color");
+      const sort = searchParams.get("sort") || "recommended";
+
       dispatch(clearFilters());
 
-      // Update Redux filter state
       if (gender.length > 0) {
         dispatch(setGenderFilter(gender));
         params.gender = gender;
@@ -64,21 +81,36 @@ const CategoryPage = () => {
         params.sort = sort;
       }
 
-      // Apply filters to products
       dispatch(filterProducts(params));
 
-      // Update category name
-      let name = 'All Products';
-      if (gender.length === 1) {
-        name = `${gender[0].charAt(0).toUpperCase() + gender[0].slice(1)}`;
-      } else if (gender.length > 1) {
-        name = 'Multiple Genders';
-      } else if (category.length > 0) {
-        name = `${category[0].charAt(0).toUpperCase() + category[0].slice(1)}`;
+      // Update category name based on selected filters
+      // Update category name based on selected filters
+      let nameParts = [];
+
+      if (gender.length > 0) {
+        nameParts.push(
+          gender.map((g) => g.charAt(0).toUpperCase() + g.slice(1)).join(" & ")
+        );
       }
+
+      if (category.length > 0) {
+        nameParts.push(
+          category
+            .map((c) => c.charAt(0).toUpperCase() + c.slice(1))
+            .join(" & ")
+        );
+      }
+
+      if (brand.length > 0) {
+        nameParts.push(
+          brand.map((b) => b.charAt(0).toUpperCase() + b.slice(1)).join(" & ")
+        );
+      }
+
+      const name = nameParts.join(" ") || "All Products";
       setCategoryName(`${name} - ${filteredItems.length} items`);
     }
-  }, [searchParams, status, dispatch, filteredItems.length]);
+  }, [searchParams, status, dispatch, filteredItems.length, isSearchMode]);
 
   useEffect(() => {
     if (status === "succeeded") {
@@ -87,32 +119,58 @@ const CategoryPage = () => {
   }, [status]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-gray-100 p-2 ">
-      <div className="container mx-auto">
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 mt-4">
-          <h1 className="text-xl font-semibold mb-2 sm:mb-0">{categoryName}</h1>
-          <SortSelect />
-        </div>
+    <div className="bg-gray-50 min-h-screen pt-20 pb-10">
+      <div className="container mx-auto px-4">
+        {isSearchMode ? (
+          <div className="pt-8">
+            <h1 className="text-2xl font-bold mb-6">{categoryName}</h1>
 
-        {status === "filtering" && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-4 rounded-lg">
-              <p>Applying filters...</p>
-            </div>
+            {searchResults.length > 0 ? (
+              <ProductGrid products={searchResults} />
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-lg text-gray-600">
+                  No products found for "{searchQuery}"
+                </p>
+                <Link
+                  href="/"
+                  className="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+                >
+                  Continue Shopping
+                </Link>
+              </div>
+            )}
           </div>
-        )}
+        ) : (
+          <>
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 pt-8">
+              <h1 className="text-2xl font-bold mb-4 sm:mb-0">
+                {categoryName}
+              </h1>
+              <SortSelect />
+            </div>
 
-        <div className="flex flex-col md:flex-row gap-0">
-          <FilterSidebar />
-          <ProductGrid products={filteredItems} />
-        </div>
+            <div className="flex flex-col lg:flex-row gap-6">
+              <div className="lg:w-1/4">
+                <FilterSidebar />
+              </div>
+              <div className="lg:w-3/4">
+                <ProductGrid products={filteredItems} />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 };
 
-export default CategoryPage;
+export default ProductsPage;

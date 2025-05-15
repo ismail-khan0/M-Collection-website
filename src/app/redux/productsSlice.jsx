@@ -32,21 +32,31 @@ const productsSlice = createSlice({
   initialState: {
     items: [],
     filteredItems: [],
+    searchResults: [], // Separate state for search results
     status: 'idle',
     error: null,
+    searchQuery: '',
   },
   reducers: {
     searchProducts: (state, action) => {
       const searchTerm = action.payload.toLowerCase().trim();
-      state.filteredItems = searchTerm 
-        ? state.items.filter(product => 
-            product.title.toLowerCase().includes(searchTerm) ||
-            product.category.toLowerCase().includes(searchTerm) ||
-            product.brand.toLowerCase().includes(searchTerm) ||
-            product.color.toLowerCase().includes(searchTerm) ||
-            product.gender.toLowerCase().includes(searchTerm)
-          )
-        : state.items;
+      state.searchQuery = searchTerm;
+      
+      if (searchTerm) {
+        state.searchResults = state.items.filter(product => 
+          product.title.toLowerCase().includes(searchTerm) ||
+          product.category.toLowerCase().includes(searchTerm) ||
+          product.brand.toLowerCase().includes(searchTerm) ||
+          product.color.toLowerCase().includes(searchTerm) ||
+          product.gender.toLowerCase().includes(searchTerm)
+        );
+      } else {
+        state.searchResults = [];
+      }
+    },
+    clearSearch: (state) => {
+      state.searchResults = [];
+      state.searchQuery = '';
     },
   // In productsSlice.js
 filterProducts: (state, action) => {
@@ -108,5 +118,5 @@ filterProducts: (state, action) => {
   },
 });
 
-export const { searchProducts, filterProducts } = productsSlice.actions;
+export const { searchProducts, filterProducts, clearSearch } = productsSlice.actions;
 export default productsSlice.reducer;
