@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import AdminLayout from "@/components/admin/AdminLayout";
-import AddProductTab from "@/components/admin/AddProductTab";
-import EditProductTab from "@/components/admin/EditProductTab";
-import ManageProductsTab from "@/components/admin/ManageProductsTab";
-import OrdersTab from "@/components/admin/OrdersTab";
+import AdminLayout from "@/Components/admin/AdminLayout";
+import AddProductTab from "@/Components/admin/AddProductTab";
+import EditProductTab from "@/Components/admin/EditProductTab";
+import ManageProductsTab from "@/Components/admin/ManageProductsTab";
+import OrdersTab from "@/Components/admin/OrdersTab";
 
 export default function AdminPage() {
   const { data: session, status } = useSession();
