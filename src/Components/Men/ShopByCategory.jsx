@@ -20,13 +20,11 @@ const ShopByCategory = ({ title = "Shop by Category", gender = "men" }) => {
         const data = await response.json();
 
         if (data.success && Array.isArray(data.products)) {
-          const categoriesMap = new Map();
-          data.products.forEach((product) => {
-            if (product?.category) {
-              categoriesMap.set(product.category, product);
-            }
-          });
-          setProducts(Array.from(categoriesMap.values()));
+          // Get ALL products with showInShopByCategory = true
+          const shopProducts = data.products.filter(
+            product => product.showInShopByCategory === true
+          );
+          setProducts(shopProducts);
         } else {
           setProducts([]);
         }
@@ -43,7 +41,6 @@ const ShopByCategory = ({ title = "Shop by Category", gender = "men" }) => {
 
   const redirectToFilter = (productOrCategory) => {
     const params = new URLSearchParams();
-
     const category = typeof productOrCategory === 'string' 
       ? productOrCategory 
       : productOrCategory?.category || '';
@@ -56,7 +53,7 @@ const ShopByCategory = ({ title = "Shop by Category", gender = "men" }) => {
 
   return (
     <div id="Shop-Category" className="py-10 bg-gray-100">
-      <div className="container mx-auto px-4">
+      <div className=" mx-auto px-4">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8 uppercase tracking-wide">
           {title}
         </h1>
@@ -69,7 +66,7 @@ const ShopByCategory = ({ title = "Shop by Category", gender = "men" }) => {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {products.map((product) => (
               <div
-                key={product._id || product.id}
+                key={product._id}
                 onClick={() => redirectToFilter(product)}
                 className="bg-white border-8 border-red-500 overflow-hidden shadow-sm cursor-pointer flex flex-col group"
               >
@@ -89,9 +86,7 @@ const ShopByCategory = ({ title = "Shop by Category", gender = "men" }) => {
 
                 <div className="bg-red-500 text-white flex flex-col justify-center items-center p-2 gap-1">
                   <p className="text-sm font-semibold">{product.category || 'Category'}</p>
-                  <p className="text-lg font-extrabold">
-                  10-15 % OFF
-                  </p>
+                  <p className="text-lg font-extrabold">10-15 % OFF</p>
                   <p className="text-sm font-semibold">Shop Now</p>
                 </div>
               </div>

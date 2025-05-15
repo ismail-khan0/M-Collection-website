@@ -44,7 +44,7 @@ export async function GET(request) {
     if (showInExploreMore)
       query.showInExploreMore = showInExploreMore === "true";
 
-    const products = await Product.find(query).limit(50).lean();
+    const products = await Product.find(query).lean();
 
     return NextResponse.json({
       success: true,

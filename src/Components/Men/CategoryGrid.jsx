@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-const CategoryGrid = ({ start = 0, end = '', gender = 'men', sectionTitle = 'Browse Categories' }) => {
+const CategoryGrid = ({ gender = 'men', sectionTitle = 'Browse Categories' }) => {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,32 +20,18 @@ const CategoryGrid = ({ start = 0, end = '', gender = 'men', sectionTitle = 'Bro
           : '/api/products?showInBrowseCategories=true';
 
         const response = await fetch(url);
-
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const data = await response.json();
-
-        const uniqueCategories = [];
-        const categorySet = new Set();
-
-        if (Array.isArray(data?.products)) {
-          data.products.forEach((product) => {
-            if (product?.category && typeof product.category === 'string') {
-              const normalized = product.category.trim();
-              if (normalized && !categorySet.has(normalized)) {
-                categorySet.add(normalized);
-                uniqueCategories.push({
-                  _id: product._id || Math.random().toString(36).substr(2, 9),
-                  title: normalized,
-                  image: product.image || '/default-product-image.png',
-                });
-              }
-            }
-          });
-
-          setCategories(uniqueCategories);
+        
+        if (data.success && Array.isArray(data.products)) {
+          // Get all products with showInBrowseCategories = true
+          const browseCategories = data.products.filter(
+            product => product.showInBrowseCategories === true
+          );
+          
+          setCategories(browseCategories);
         } else {
-          console.warn('Unexpected API structure:', data);
           setCategories([]);
         }
       } catch (error) {
@@ -74,7 +60,7 @@ const CategoryGrid = ({ start = 0, end = '', gender = 'men', sectionTitle = 'Bro
           {sectionTitle}
         </h2>
         <div className="flex flex-wrap justify-center gap-4 max-w-7xl mx-auto">
-          {Array.from({ length: end - start }).map((_, index) => (
+          {Array.from({ length: 14 }).map((_, index) => (
             <div
               key={index}
               className="flex flex-col items-center bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm w-36 animate-pulse"
@@ -106,10 +92,10 @@ const CategoryGrid = ({ start = 0, end = '', gender = 'men', sectionTitle = 'Bro
 
       {categories.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 max-w-7xl mx-auto">
-          {categories.slice(start, end).map((category, index) => (
+          {categories.slice(0, 14).map((category, index) => (
             <div
-              key={category._id}
-              onClick={() => redirectToFilter(category.title)}
+              key={category._id || index}
+              onClick={() => redirectToFilter(category.category)}
               className="flex flex-col items-center bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm hover:shadow-md cursor-pointer transition-all duration-300 transform hover:scale-105"
               style={{ transitionDelay: `${index * 50}ms` }}
             >

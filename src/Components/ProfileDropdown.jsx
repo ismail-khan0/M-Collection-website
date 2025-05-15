@@ -56,7 +56,7 @@ export default function ProfileDropdown() {
     <li><Link href="/products">Orders</Link></li>
     <li><Link href="/wishlist">Wishlist</Link></li>
     <li><Link href="/gifts">Gift Cards</Link></li>
-    <li><Link href="/support">Contact Us</Link></li>
+    <li><Link href="/ChatPage">Contact Us</Link></li>
 
   </ul>
 </div>

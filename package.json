@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "dev:socket": "nodemon --exec \"node --loader ts-node/esm server.mjs\"",
+    "dev": "nodemon --exec \"node --loader ts-node/esm server.mjs\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
