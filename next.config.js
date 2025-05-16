@@ -11,6 +11,9 @@ module.exports = {
       'img.freepik.com',
     ],
   },
+  env: {
+    MONGODB_URI: process.env.MONGODB_URI,
+  },
   async headers() {
     return [
       {
