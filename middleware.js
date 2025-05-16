@@ -1,17 +1,16 @@
-// src/middleware.js
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
-import { authOptions } from "@/auth/config";
+export { auth as middleware } from "./src/auth.config";
 
 export async function middleware(req) {
   const path = req.nextUrl.pathname;
 
-  // Skip middleware for API routes and auth pages
-  if (path.startsWith('/api/auth') || path === '/admin/signin') {
+  // Skip middleware for API routes and signin page
+  if (path.startsWith('/api') || path === '/admin/signin') {
     return NextResponse.next();
   }
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({ req });
 
   if (path.startsWith("/admin")) {
     if (!token) {
@@ -28,6 +27,6 @@ export async function middleware(req) {
   return NextResponse.next();
 }
 
-export const config = {
+export const config  = {
   matcher: ["/admin/:path*"],
 };

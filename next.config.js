@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+module.exports = {
   reactStrictMode: true,
   images: {
     domains: [
@@ -11,17 +11,31 @@ const nextConfig = {
       'img.freepik.com',
     ],
   },
-  experimental: {
-    serverComponentsExternalPackages: ['mongoose', 'bcryptjs'],
-    optimizeServerReact: true,
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,POST,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+        ],
+      },
+    ];
   },
   webpack: (config) => {
-    config.externals.push({
-      'utf-8-validate': 'commonjs utf-8-validate',
-      'bufferutil': 'commonjs bufferutil',
-    });
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'socket.io-client': 'socket.io-client/dist/socket.io.js',
+    };
     return config;
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/socket.io/:path*',
+        destination: '/api/socket', // Make sure this matches your API route
+      }
+    ]
   }
 };
-
-module.exports = nextConfig;
