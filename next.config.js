@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
   reactStrictMode: true,
   images: {
     domains: [
@@ -11,9 +11,13 @@ module.exports = {
       'img.freepik.com',
     ],
   },
-   env: {
+  env: {
     MONGODB_URI: process.env.MONGODB_URI,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+  },
+  experimental: {
+    serverComponentsExternalPackages: ['mongoose', 'bcryptjs'],
+    serverActions: true,
   },
   async headers() {
     return [
@@ -32,14 +36,31 @@ module.exports = {
       ...config.resolve.alias,
       'socket.io-client': 'socket.io-client/dist/socket.io.js',
     };
+    
+    // Add support for top-level await
+    config.experiments = { 
+      ...config.experiments, 
+      topLevelAwait: true 
+    };
+    
     return config;
   },
   async rewrites() {
     return [
       {
         source: '/api/socket.io/:path*',
-        destination: '/api/socket', // Make sure this matches your API route
+        destination: '/api/socket',
       }
-    ]
-  }
+    ];
+  },
+  typescript: {
+    // Enable this during development if you want to bypass TS errors
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    // Enable this during development if you want to bypass ESLint errors
+    ignoreDuringBuilds: false,
+  },
 };
+
+module.exports = nextConfig;
