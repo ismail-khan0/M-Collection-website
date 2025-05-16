@@ -1,7 +1,7 @@
 import Order from '../../../../model/order';
 import connectMongoDB from '../../../../lib/connectMongoDB ';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '../../../auth.config';
 
 function parsePrice(price) {
   if (typeof price === 'number') return price;

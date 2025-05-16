@@ -1,9 +1,9 @@
 // app/api/chat/messages/route.js
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "../../../auth.config";
 import ChatMessage from "../../../../model/chatMessage";
 import connectMongoDB from "../../../../lib/connectMongoDB ";
-import { ObjectId } from 'mongodb';
+
 
 export async function GET() {
   const session = await getServerSession(authOptions);

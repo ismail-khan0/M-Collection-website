@@ -1,4 +1,5 @@
 
+'use client';
 import ChatButton from '@/Components/Chat/ChatButton'
 import React from 'react'
 

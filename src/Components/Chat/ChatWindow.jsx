@@ -1,5 +1,5 @@
-"use client";
-
+// components/ChatWindow.js
+'use client'; 
 import { useEffect, useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { socket } from '../../../lib/socket.js';

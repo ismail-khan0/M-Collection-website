@@ -1,6 +1,6 @@
 // app/api/admin/users/route.js
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '../../../../auth.config';
 import User from '../../../../../model/user';
 import connectMongoDB from '../../../../../lib/connectMongoDB ';
 
