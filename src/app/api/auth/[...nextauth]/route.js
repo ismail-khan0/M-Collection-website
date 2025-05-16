@@ -1,11 +1,11 @@
-// authOptions.ts
+// src/app/api/auth/[...nextauth]/route.ts
 import NextAuth from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
 import User from "../../../../../model/user";
 import bcrypt from "bcryptjs";
-import connectMongoDB from "../../../../../lib/connectMongoDB ";
+import connectMongoDB from "../../../../../lib/connectMongoDB";
 
-export const authOptions = {
+const authOptions = {
   providers: [
     CredentialsProvider({
       id: 'credentials',
@@ -67,5 +67,6 @@ export const authOptions = {
   debug: process.env.NODE_ENV === 'development'
 };
 
-export const handler = NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+
 export { handler as GET, handler as POST };
