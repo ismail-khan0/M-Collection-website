@@ -1,8 +1,8 @@
 // app/api/admin/login/route.js
 import { NextResponse } from 'next/server';
-import User from '@/model/user';
+import User from '../../../../model/user';
 import bcrypt from 'bcryptjs';
-import connectMongoDB from '@/lib/connectMongoDB';
+import connectMongoDB from '../../../../lib/connectMongoDB ';
 import { signIn } from 'next-auth/react';
 
 export async function POST(req) {
