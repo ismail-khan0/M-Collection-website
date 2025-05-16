@@ -1,20 +1,10 @@
 // app/layout.jsx
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSans, GeistMono } from 'geist/font';
 import "./globals.css";
 import { Providers } from './Providers';
 import Header from "@/Components/Header";
 import Footer from "@/Components/Footer";
 import ChatButton from "@/Components/Chat/ChatButton";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata = {
   title: "M Collection",
@@ -23,13 +13,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="relative">
         <Providers>
           <Header />
           <main className="min-h-screen mt-20">{children}</main>
           <Footer />
-          {/* Floating chat button */}
           <ChatButton />
         </Providers>
       </body>

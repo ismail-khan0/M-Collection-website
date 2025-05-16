@@ -4,7 +4,7 @@ export default function FilterControls({ filters, onFilterChange }) {
       <h3 className="text-lg font-medium mb-3">Filters</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block mb-1">Gender</label>
+          <label className="block mb-2">Gender</label>
           <select
             name="gender"
             value={filters.gender}
