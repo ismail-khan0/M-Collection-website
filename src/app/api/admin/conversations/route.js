@@ -1,6 +1,6 @@
 // app/api/admin/conversations/route.js
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/auth/config';
+import { authOptions } from '../../../../auth.config';
 import ChatMessage from '../../../../../model/chatMessage';
 import User from '../../../../../model/user';
 import connectMongoDB from '../../../../../lib/connectMongoDB ';
