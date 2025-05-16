@@ -4,6 +4,7 @@ import ChatMessage from '../../../../../model/chatMessage';
 import User from '../../../../../model/user';
 import connectMongoDB from '../../../../../lib/connectMongoDB ';
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   // Verify admin authentication
