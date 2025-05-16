@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "../../../../auth.config";
 import ChatMessage from "../../../../../model/chatMessage";
 import connectMongoDB from "../../../../../lib/connectMongoDB ";
 import { ObjectId } from "mongodb";

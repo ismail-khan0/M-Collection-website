@@ -1,5 +1,5 @@
 // app/chat/layout.jsx
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '../../auth.config';
 import { getServerSession } from 'next-auth';
 
 export default async function ChatLayout({ children }) {
