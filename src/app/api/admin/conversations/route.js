@@ -19,9 +19,9 @@ export async function GET() {
     }
 
     // Dynamic imports for database modules
-    const { default: connectMongoDB } = await import('@/lib/connectMongoDB');
-    const { default: ChatMessage } = await import('@/model/chatMessage');
-    const { default: User } = await import('@/model/user');
+    const { default: connectMongoDB } = await import('../../../../../lib/connectMongoDB ');
+    const { default: ChatMessage } = await import('../../../../../modelchatMessage');
+    const { default: User } = await import('../../../../../model/user');
 
     await connectMongoDB();
 
