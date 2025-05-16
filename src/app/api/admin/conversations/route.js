@@ -1,32 +1,44 @@
 // app/api/admin/conversations/route.js
-import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../../auth.config';
-
-// Force dynamic rendering - crucial for API routes with auth/database
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+import ChatMessage from '../../../../../model/chatMessage';
+import User from '../../../../../model/user';
+import connectMongoDB from '../../../../../lib/connectMongoDB ';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
+  // Verify admin authentication
+  let session;
   try {
-    // Verify session
-    const session = await getServerSession(authOptions);
+    session = await getServerSession(authOptions);
     if (!session?.user?.isAdmin) {
       return NextResponse.json(
         { error: 'Unauthorized' }, 
         { status: 401 }
       );
     }
-//here is
-    // Dynamic imports for database modules
-    const { default: connectMongoDB } = await import('../../../../../lib/connectMongoDB ');
-    const { default: ChatMessage } = await import('../../../../../model/chatMessage');
-    const { default: User } = await import('../../../../../model/user');
+  } catch (authError) {
+    console.error('Authentication error:', authError);
+    return NextResponse.json(
+      { error: 'Authentication failed' },
+      { status: 500 }
+    );
+  }
 
+  // Connect to database
+  try {
     await connectMongoDB();
+  } catch (dbError) {
+    console.error('Database connection error:', dbError);
+    return NextResponse.json(
+      { error: 'Database connection failed' },
+      { status: 500 }
+    );
+  }
 
-    // Simplified aggregation for better build compatibility
-    const conversations = await ChatMessage.aggregate([
+  // Fetch conversations
+  try {
+    const userMessages = await ChatMessage.aggregate([
       {
         $match: {
           $or: [
@@ -34,9 +46,6 @@ export async function GET() {
             { sender: 'admin', recipient: 'user' }
           ]
         }
-      },
-      {
-        $sort: { createdAt: -1 }
       },
       {
         $group: {
@@ -47,8 +56,8 @@ export async function GET() {
               '$recipientId'
             ]
           },
-          lastMessage: { $first: '$message' },
-          timestamp: { $first: '$createdAt' },
+          lastMessage: { $last: '$message' },
+          timestamp: { $last: '$createdAt' },
           unreadCount: {
             $sum: {
               $cond: [
@@ -64,12 +73,14 @@ export async function GET() {
             }
           }
         }
+      },
+      {
+        $sort: { timestamp: -1 }
       }
     ]);
 
-    // Parallel user fetching with error handling
-    const enrichedConversations = await Promise.all(
-      conversations.map(async (msg) => {
+    const conversations = (await Promise.all(
+      userMessages.map(async (msg) => {
         try {
           const user = await User.findById(msg._id).select('name email');
           return user ? {
@@ -82,21 +93,18 @@ export async function GET() {
             timestamp: msg.timestamp,
             unread: msg.unreadCount > 0
           } : null;
-        } catch (error) {
-          console.error(`Error processing user ${msg._id}:`, error);
+        } catch (userError) {
+          console.error('Error fetching user:', userError);
           return null;
         }
       })
-    );
+    )).filter(c => c !== null);
 
-    return NextResponse.json({ 
-      conversations: enrichedConversations.filter(Boolean) 
-    });
-
+    return NextResponse.json({ conversations });
   } catch (error) {
-    console.error('API Route Error:', error);
+    console.error('Error fetching conversations:', error);
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: 'Failed to fetch conversations' },
       { status: 500 }
     );
   }
