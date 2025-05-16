@@ -1,5 +1,6 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
+export { auth as middleware } from "./src/auth.config";
 
 export async function middleware(req) {
   const path = req.nextUrl.pathname;
@@ -26,6 +27,6 @@ export async function middleware(req) {
   return NextResponse.next();
 }
 
-export const config = {
+export const config  = {
   matcher: ["/admin/:path*"],
 };

@@ -1,40 +1,49 @@
 // src/auth.config.js
 import CredentialsProvider from "next-auth/providers/credentials";
-import User from "../model/user.js";
+import User from "../model/user";
 import bcrypt from "bcryptjs";
-import connectMongoDB from "../lib/connectMongoDB .js";
+import connectMongoDB from "../lib/connectMongoDB ";
 
 export const authOptions = {
   providers: [
     CredentialsProvider({
-      id: 'credentials',
       name: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' }
+        password: { label: 'Password', type: 'password' },
+        admin: { type: 'boolean', optional: true }
       },
       async authorize(credentials) {
-        await connectMongoDB();
-        
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email and password are required');
+        try {
+          await connectMongoDB();
+
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error('Email and password are required');
+          }
+
+          const user = await User.findOne({ email: credentials.email });
+          if (!user) throw new Error('Invalid credentials');
+
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+          if (!isPasswordValid) throw new Error('Invalid credentials');
+
+          if (credentials.admin && !user.isAdmin) {
+            throw new Error('Admin privileges required');
+          }
+
+          return {
+            id: user._id.toString(),
+            name: user.fullname,
+            email: user.email,
+            isAdmin: user.isAdmin
+          };
+        } catch (error) {
+          console.error('Authentication error:', error);
+          throw error;
         }
-
-        const user = await User.findOne({ email: credentials.email }).select('+password');
-        if (!user) throw new Error('Invalid credentials');
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-        if (!isPasswordValid) throw new Error('Invalid credentials');
-
-        return {
-          id: user._id.toString(),
-          name: user.fullname,
-          email: user.email,
-          isAdmin: user.isAdmin
-        };
       }
     })
   ],
@@ -53,10 +62,6 @@ export const authOptions = {
       }
       return session;
     }
-  },
-  session: {
-    strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: '/admin/signin',

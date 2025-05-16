@@ -1,5 +1,5 @@
 import Message from "../../../../model/chatMessage";
-import { connectMongoDB } from "../../../../lib/connectMongoDB ";
+import  connectMongoDB  from "../../../../lib/connectMongoDB ";
 
 export async function GET(req) {
   try {
