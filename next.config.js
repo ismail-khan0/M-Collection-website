@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     domains: [
-       'via.placeholder.com',
+      'via.placeholder.com',
       'placekitten.com',
       'images.unsplash.com',
       'jsonplaceholder.typicode.com',
@@ -12,7 +12,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-   serverComponentsExternalPackages: ['mongoose', 'bcryptjs'],
+    serverComponentsExternalPackages: ['mongoose', 'bcryptjs'],
     optimizeServerReact: true,
   },
   webpack: (config) => {
@@ -21,13 +21,7 @@ const nextConfig = {
       'bufferutil': 'commonjs bufferutil',
     });
     return config;
-  },
-  typescript: {
-    ignoreBuildErrors: true, // Temporary during debugging
-  },
-  eslint: {
-    ignoreDuringBuilds: true, // Temporary during debugging
-  },
+  }
 };
 
 module.exports = nextConfig;

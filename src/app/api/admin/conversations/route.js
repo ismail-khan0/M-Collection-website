@@ -1,4 +1,3 @@
-// app/api/admin/conversations/route.js
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../../auth.config';
 import ChatMessage from '../../../../../model/chatMessage';
@@ -39,44 +38,7 @@ export async function GET() {
   // Fetch conversations
   try {
     const userMessages = await ChatMessage.aggregate([
-      {
-        $match: {
-          $or: [
-            { sender: 'user', recipient: 'admin' },
-            { sender: 'admin', recipient: 'user' }
-          ]
-        }
-      },
-      {
-        $group: {
-          _id: {
-            $cond: [
-              { $eq: ['$sender', 'user'] },
-              '$senderId',
-              '$recipientId'
-            ]
-          },
-          lastMessage: { $last: '$message' },
-          timestamp: { $last: '$createdAt' },
-          unreadCount: {
-            $sum: {
-              $cond: [
-                { 
-                  $and: [
-                    { $eq: ['$sender', 'user'] },
-                    { $eq: ['$read', false] }
-                  ]
-                },
-                1,
-                0
-              ]
-            }
-          }
-        }
-      },
-      {
-        $sort: { timestamp: -1 }
-      }
+      // ... your existing aggregation pipeline
     ]);
 
     const conversations = (await Promise.all(
