@@ -1,11 +1,11 @@
-// authOptions.ts
+// src/app/api/auth/[...nextauth]/route.ts
 import NextAuth from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
 import User from "../../../../../model/user";
 import bcrypt from "bcryptjs";
-import connectMongoDB from "../../../../../lib/connectMongoDB "; 
+import connectMongoDB from "../../../../../lib/connectMongoDB ";
 
-export const authOptions = {
+const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -62,25 +62,6 @@ export const authOptions = {
         session.user.isAdmin = token.isAdmin;
       }
       return session;
-    },
-    async redirect({ url, baseUrl }) {
-      // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url;
-      return baseUrl;
-    }
-  },
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60 // 30 days
-      }
     }
   },
   session: {
@@ -96,4 +77,5 @@ export const authOptions = {
 };
 
 const handler = NextAuth(authOptions);
+
 export { handler as GET, handler as POST };
