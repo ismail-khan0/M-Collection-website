@@ -11,7 +11,7 @@ export async function middleware(req) {
     return NextResponse.next();
   }
 
-  const token = await getToken({ req, secret: authOptions.secret });
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   if (path.startsWith("/admin")) {
     if (!token) {
