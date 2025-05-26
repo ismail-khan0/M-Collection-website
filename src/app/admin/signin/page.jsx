@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
@@ -9,12 +9,7 @@ export default function AdminSigninForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,16 +26,18 @@ export default function AdminSigninForm() {
         redirect: false,
         email,
         password,
-        callbackUrl: '/inputData'
+        callbackUrl: '/inputData' // Explicit callback URL
       });
 
       if (result?.error) {
+        // Handle specific error messages
         const errorMessage = result.error === 'CredentialsSignin' 
           ? 'Invalid credentials' 
           : result.error;
         throw new Error(errorMessage);
       }
 
+      // If no error and URL is provided, redirect
       if (result?.url) {
         router.push(result.url);
       }
@@ -51,10 +48,6 @@ export default function AdminSigninForm() {
       setIsLoading(false);
     }
   };
-
-  if (!isMounted) {
-    return null; // or return a loading spinner
-  }
 
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
