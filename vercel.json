@@ -1,12 +1,12 @@
 {
-  "rewrites": async () => [
+  "version": 2,
+  "builds": [
+    { "src": "*.jsx", "use": "@vercel/node" }
+  ],
+  "routes": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/"
+      "src": "/(.*)",
+      "dest": "/"
     }
   ]
 }

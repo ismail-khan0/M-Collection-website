@@ -1,15 +1,25 @@
+// app/admin/signin/page.js
 'use client';
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 
-export default function AdminSigninForm() {
+// Disable static generation for this page
+export const dynamic = 'force-dynamic';
+
+export default function AdminSigninPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,18 +36,16 @@ export default function AdminSigninForm() {
         redirect: false,
         email,
         password,
-        callbackUrl: '/inputData' // Explicit callback URL
+        callbackUrl: '/inputData'
       });
 
       if (result?.error) {
-        // Handle specific error messages
         const errorMessage = result.error === 'CredentialsSignin' 
           ? 'Invalid credentials' 
           : result.error;
         throw new Error(errorMessage);
       }
 
-      // If no error and URL is provided, redirect
       if (result?.url) {
         router.push(result.url);
       }
@@ -48,6 +56,11 @@ export default function AdminSigninForm() {
       setIsLoading(false);
     }
   };
+
+  // Return null or loading state during SSR
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">

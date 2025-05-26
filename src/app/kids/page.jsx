@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useEffect, useState } from "react";
 import AdBanner from "@/Components/AdBanner";
 import FavoriteBrands from "@/Components/FavoriteBrands";
