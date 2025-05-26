@@ -1,4 +1,5 @@
 // app/admin/signin/page.js
+'use client';
 
 import AdminSigninForm from '@/Components/admin/AdminSigninForm';
 
